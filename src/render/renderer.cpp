@@ -44,4 +44,8 @@ SDL_Renderer *Renderer::getSDLRenderer() const
   return renderer;
 }
 
-void Renderer::renderFrame() {}
+void Renderer::renderFrame()
+{
+  clear();
+  present();
+}

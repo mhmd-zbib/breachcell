@@ -9,11 +9,8 @@ int main()
   InputHandler &inputHandler = InputHandler::getInstance();
   Renderer &renderer = Renderer::getInstance();
   Engine &engine = Engine::getInstance(inputHandler, renderer);
-
   if (!engine.init("BreachCell 2D Game", 800, 600))
-  {
     return 1;
-  }
   while (engine.isRunning())
   {
     engine.handleInput();
