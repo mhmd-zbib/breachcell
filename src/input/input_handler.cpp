@@ -20,10 +20,15 @@ void InputHandler::handleInput(bool &running)
     {
       running = false;
     }
-    else if (event.type == SDL_KEYDOWN || event.type == SDL_KEYUP)
+    else if (event.type == SDL_KEYDOWN)
     {
-      std::cout << "Key " << (event.type == SDL_KEYDOWN ? "pressed: " : "released: ")
-                << SDL_GetKeyName(event.key.keysym.sym) << std::endl;
+      std::cout << "Key pressed: " << SDL_GetKeyName(event.key.keysym.sym) << std::endl;
+      if (event.key.keysym.sym == SDLK_ESCAPE)
+        running = false;
+    }
+    else if (event.type == SDL_KEYUP)
+    {
+      std::cout << "Key released: " << SDL_GetKeyName(event.key.keysym.sym) << std::endl;
     }
     else if (event.type == SDL_MOUSEMOTION)
     {

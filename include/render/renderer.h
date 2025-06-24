@@ -5,16 +5,15 @@ class Renderer
 {
 public:
   static Renderer &getInstance();
-  void renderFrame();
   bool init(SDL_Window *window);
   void handleInput(bool &running);
+  SDL_Renderer *getSDLRenderer() const;
+  void clear();
+  void present();
 
 private:
   Renderer();
   ~Renderer();
-  void clear();
-  void present();
-  SDL_Renderer *getSDLRenderer() const;
 
   SDL_Renderer *renderer;
 };
