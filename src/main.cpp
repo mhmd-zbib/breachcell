@@ -6,6 +6,7 @@
 #include "ecs/systems/render_system.h"
 #include "ecs/components.h"
 #include "ecs/entity_manager.h"
+#include "factories/player_factory.h"
 
 int main()
 {
@@ -18,16 +19,7 @@ int main()
 
   renderSystem.loadTextures();
 
-  EntityManager &entityManager = EntityManager::getInstance();
-  std::uint32_t playerEntityId = entityManager.createEntity();
-  TransformComponent playerTransform{400.0f, 300.0f, 0.0f, 1.0f};
-  VelocityComponent playerVelocity{0.0f, 0.0f};
-  SpriteComponent playerSprite{1, 0};
-  InputComponent playerInput{false, false, false, false};
-  entityManager.addTransformComponent(playerEntityId, playerTransform);
-  entityManager.addVelocityComponent(playerEntityId, playerVelocity);
-  entityManager.addSpriteComponent(playerEntityId, playerSprite);
-  entityManager.addInputComponent(playerEntityId, playerInput);
+  std::uint32_t playerEntityId = PlayerFactory::getInstance().createPlayer(400.0f, 300.0f, 0.0f, 1.0f, 1, 0);
 
   while (engine.isRunning())
   {
