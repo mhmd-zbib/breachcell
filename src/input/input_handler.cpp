@@ -1,5 +1,6 @@
 #include "input/input_handler.h"
 #include <iostream>
+#include <unordered_set>
 
 InputHandler &InputHandler::getInstance()
 {
@@ -22,12 +23,14 @@ void InputHandler::handleInput(bool &running)
     }
     else if (event.type == SDL_KEYDOWN)
     {
+      pressedKeys.insert(event.key.keysym.sym);
       std::cout << "Key pressed: " << SDL_GetKeyName(event.key.keysym.sym) << std::endl;
       if (event.key.keysym.sym == SDLK_ESCAPE)
         running = false;
     }
     else if (event.type == SDL_KEYUP)
     {
+      pressedKeys.erase(event.key.keysym.sym);
       std::cout << "Key released: " << SDL_GetKeyName(event.key.keysym.sym) << std::endl;
     }
     else if (event.type == SDL_MOUSEMOTION)
@@ -40,6 +43,11 @@ void InputHandler::handleInput(bool &running)
                 << " at (" << event.button.x << ", " << event.button.y << ")" << std::endl;
     }
   }
+}
+
+bool InputHandler::isKeyPressed(SDL_Keycode key) const
+{
+  return pressedKeys.find(key) != pressedKeys.end();
 }
 
 void InputHandler::processInput() {}
