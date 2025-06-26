@@ -2,6 +2,8 @@
 #include "ecs/entity_manager.h"
 #include "ecs/components.h"
 #include "render/renderer.h"
+#include "ecs/systems/aiming_system.h"
+#include "core/engine.h"
 #include <SDL2/SDL_image.h>
 #include <unordered_map>
 #include <string>
@@ -123,4 +125,29 @@ void RenderSystem::renderAll()
   }
   if (!anyRendered)
     std::cerr << "RenderSystem warning: No entities rendered this frame" << std::endl;
+}
+
+void RenderSystem::renderAimLine()
+{
+  std::uint32_t playerId = Engine::getInstance(InputHandler::getInstance(), Renderer::getInstance()).getPlayerEntityId();
+  EntityManager &entityManager = EntityManager::getInstance();
+  TransformComponent *playerTransform = entityManager.getTransformComponent(playerId);
+  if (!playerTransform)
+    return;
+  float angle = AimingSystem::getInstance().getAimAngle();
+  Renderer &renderer = Renderer::getInstance();
+  SDL_Renderer *sdlRenderer = renderer.getSDLRenderer();
+  float lineLength = 100.0f;
+  float startX = playerTransform->positionX + PLAYER_TEXTURE_WIDTH / 2;
+  float startY = playerTransform->positionY + PLAYER_TEXTURE_HEIGHT / 2;
+  float halfCone = 17.5f * 3.14159265f / 180.0f;
+  float leftAngle = angle - halfCone;
+  float rightAngle = angle + halfCone;
+  float leftEndX = startX + std::cos(leftAngle) * lineLength;
+  float leftEndY = startY + std::sin(leftAngle) * lineLength;
+  float rightEndX = startX + std::cos(rightAngle) * lineLength;
+  float rightEndY = startY + std::sin(rightAngle) * lineLength;
+  SDL_SetRenderDrawColor(sdlRenderer, 255, 0, 0, 255);
+  SDL_RenderDrawLine(sdlRenderer, static_cast<int>(startX), static_cast<int>(startY), static_cast<int>(leftEndX), static_cast<int>(leftEndY));
+  SDL_RenderDrawLine(sdlRenderer, static_cast<int>(startX), static_cast<int>(startY), static_cast<int>(rightEndX), static_cast<int>(rightEndY));
 }

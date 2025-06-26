@@ -1,6 +1,11 @@
 #include "core/engine.h"
 #include "render/renderer.h"
 #include "input/input_handler.h"
+#include "ecs/systems/movement_system.h"
+#include "ecs/systems/aiming_system.h"
+#include "ecs/systems/render_system.h"
+#include "ecs/entity_manager.h"
+#include "ecs/components.h"
 #include <stdexcept>
 #include <iostream>
 
@@ -31,6 +36,7 @@ bool Engine::init(const char *windowTitle, int windowWidth, int windowHeight)
   }
   std::cout << "Renderer pointer: " << rendererReference.getSDLRenderer() << std::endl;
   running = true;
+  InputSystem::getInstance().setRunning(running);
   return true;
 }
 
@@ -44,12 +50,30 @@ void Engine::handleInput()
   inputHandlerReference.handleInput(running);
 }
 
+void Engine::setPlayerEntityId(std::uint32_t id)
+{
+  playerEntityId = id;
+  MovementSystem::getInstance().setPlayerEntityId(id);
+  AimingSystem::getInstance().setPlayerEntityId(id);
+}
+
 void Engine::update()
 {
+  InputSystem::getInstance().update();
+  AimingSystem::getInstance().update();
+  Uint32 currentTicks = SDL_GetTicks();
+  static Uint32 lastTicks = currentTicks;
+  float deltaTime = (currentTicks - lastTicks) / 1000.0f;
+  lastTicks = currentTicks;
+  MovementSystem::getInstance().update(deltaTime);
 }
 
 void Engine::render()
 {
+  rendererReference.clear();
+  RenderSystem::getInstance().renderAll();
+  RenderSystem::getInstance().renderAimLine();
+  rendererReference.present();
 }
 
 void Engine::clean()

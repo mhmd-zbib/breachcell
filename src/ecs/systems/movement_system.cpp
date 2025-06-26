@@ -48,3 +48,12 @@ void MovementSystem::update(float deltaTime)
     transform->positionY += velocity->velocityY * deltaTime;
   }
 }
+
+void MovementSystem::update()
+{
+  static Uint32 lastTicks = SDL_GetTicks();
+  Uint32 currentTicks = SDL_GetTicks();
+  float deltaTime = (currentTicks - lastTicks) / 1000.0f;
+  lastTicks = currentTicks;
+  update(deltaTime);
+}
