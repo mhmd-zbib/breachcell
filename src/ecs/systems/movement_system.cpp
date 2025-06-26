@@ -20,19 +20,14 @@ void MovementSystem::update(float deltaTime)
   EntityManager &entityManager = EntityManager::getInstance();
   InputHandler &inputHandler = InputHandler::getInstance();
 
-  // Define movement speed (pixels per second)
-  constexpr float speed = 200.0f;
-
-  // Only update the player entity with input
   auto velocity = entityManager.getVelocityComponent(playerEntityId);
   auto transform = entityManager.getTransformComponent(playerEntityId);
   if (velocity && transform)
   {
-    // Reset velocity
     velocity->velocityX = 0.0f;
     velocity->velocityY = 0.0f;
 
-    // WASD movement
+    float speed = inputHandler.isKeyPressed(SDLK_LSHIFT) || inputHandler.isKeyPressed(SDLK_RSHIFT) ? SLOW_SPEED : NORMAL_SPEED;
     if (inputHandler.isKeyPressed(SDLK_w))
       velocity->velocityY = -speed;
     if (inputHandler.isKeyPressed(SDLK_s))

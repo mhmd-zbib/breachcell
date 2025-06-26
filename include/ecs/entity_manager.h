@@ -17,6 +17,7 @@ public:
   void addVelocityComponent(std::uint32_t entityId, const VelocityComponent &component);
   void addSpriteComponent(std::uint32_t entityId, const SpriteComponent &component);
   void addInputComponent(std::uint32_t entityId, const InputComponent &component);
+  static constexpr std::uint32_t MAX_ENTITY_ID = 1024;
 
 private:
   EntityManager();

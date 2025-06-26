@@ -60,9 +60,8 @@ void RenderSystem::renderAll()
     std::exit(1);
   }
   EntityManager &entityManager = EntityManager::getInstance();
-  std::uint32_t maxEntityId = 1024;
   bool anyRendered = false;
-  for (std::uint32_t entityId = 1; entityId < maxEntityId; ++entityId)
+  for (std::uint32_t entityId = 1; entityId < EntityManager::MAX_ENTITY_ID; ++entityId)
   {
     TransformComponent *transform = nullptr;
     SpriteComponent *sprite = nullptr;
@@ -98,8 +97,8 @@ void RenderSystem::renderAll()
       SDL_Rect dstRect;
       dstRect.x = static_cast<int>(transform->positionX);
       dstRect.y = static_cast<int>(transform->positionY);
-      dstRect.w = 64;
-      dstRect.h = 64;
+      dstRect.w = PLAYER_TEXTURE_WIDTH;
+      dstRect.h = PLAYER_TEXTURE_HEIGHT;
       SDL_Texture *texture = nullptr;
       try
       {

@@ -8,6 +8,8 @@ public:
   static RenderSystem &getInstance();
   void renderAll();
   void loadTextures();
+  static constexpr int PLAYER_TEXTURE_WIDTH = 64;
+  static constexpr int PLAYER_TEXTURE_HEIGHT = 64;
 
 private:
   RenderSystem();
