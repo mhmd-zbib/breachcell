@@ -25,7 +25,7 @@ RenderSystem &RenderSystem::getInstance()
   return instance;
 }
 
-RenderSystem::RenderSystem() : playerTextureId(0) {}
+RenderSystem::RenderSystem() : playerTextureId(0), enemyTextureId(0) {}
 
 RenderSystem::~RenderSystem() { unloadTextures(); }
 
@@ -42,6 +42,15 @@ void RenderSystem::loadTextures()
     std::exit(1);
   }
   textures[playerTextureId] = playerTexture;
+  enemyTextureId = 2;
+  SDL_Texture *enemyTexture = loadTexture("assets/enemy.png", sdlRenderer);
+  if (!enemyTexture)
+  {
+    std::cerr << "Failed to load enemy texture: assets/enemy.png\n";
+    std::cerr << "SDL_image error: " << IMG_GetError() << std::endl;
+    std::exit(1);
+  }
+  textures[enemyTextureId] = enemyTexture;
 }
 
 void RenderSystem::unloadTextures()
@@ -94,7 +103,7 @@ void RenderSystem::renderAll()
     }
     if (transform && sprite)
     {
-      if (sprite->textureId != playerTextureId)
+      if (sprite->textureId != playerTextureId && sprite->textureId != enemyTextureId)
       {
         std::cerr << "RenderSystem warning: Unknown textureId " << sprite->textureId << " for entity " << entityId << std::endl;
         continue;

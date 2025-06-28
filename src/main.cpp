@@ -9,6 +9,7 @@
 #include "ecs/components.h"
 #include "ecs/entity_manager.h"
 #include "factories/player_factory.h"
+#include "factories/enemy_factory.h"
 
 int main()
 {
@@ -21,6 +22,7 @@ int main()
   renderSystem.loadTextures();
   std::uint32_t playerEntityId = PlayerFactory::getInstance().createPlayer(400.0f, 300.0f, 0.0f, 1.0f, 1, 0);
   engine.setPlayerEntityId(playerEntityId);
+  std::uint32_t enemyEntityId = EnemyFactory::getInstance().createEnemy(200.0f, 200.0f, 0.0f, 1.0f, renderSystem.getEnemyTextureId(), 1);
   while (engine.isRunning())
   {
     engine.handleInput();
