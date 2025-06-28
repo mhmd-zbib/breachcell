@@ -15,6 +15,7 @@ void EntityManager::destroyEntity(std::uint32_t entityId)
   velocityComponents.erase(entityId);
   spriteComponents.erase(entityId);
   inputComponents.erase(entityId);
+  projectileComponents.erase(entityId);
 }
 TransformComponent *EntityManager::getTransformComponent(std::uint32_t entityId)
 {
@@ -44,6 +45,13 @@ InputComponent *EntityManager::getInputComponent(std::uint32_t entityId)
     return &it->second;
   return nullptr;
 }
+ProjectileComponent *EntityManager::getProjectileComponent(std::uint32_t entityId)
+{
+  auto it = projectileComponents.find(entityId);
+  if (it != projectileComponents.end())
+    return &it->second;
+  return nullptr;
+}
 void EntityManager::addTransformComponent(std::uint32_t entityId, const TransformComponent &component)
 {
   transformComponents[entityId] = component;
@@ -59,4 +67,8 @@ void EntityManager::addSpriteComponent(std::uint32_t entityId, const SpriteCompo
 void EntityManager::addInputComponent(std::uint32_t entityId, const InputComponent &component)
 {
   inputComponents[entityId] = component;
+}
+void EntityManager::addProjectileComponent(std::uint32_t entityId, const ProjectileComponent &component)
+{
+  projectileComponents[entityId] = component;
 }

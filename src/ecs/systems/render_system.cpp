@@ -86,6 +86,9 @@ void RenderSystem::renderAll()
     }
     if (transform && !sprite)
     {
+      ProjectileComponent *projectile = entityManager.getProjectileComponent(entityId);
+      if (projectile)
+        continue;
       std::cerr << "RenderSystem warning: TransformComponent found but SpriteComponent missing for entity " << entityId << std::endl;
       continue;
     }
@@ -150,4 +153,34 @@ void RenderSystem::renderAimLine()
   SDL_SetRenderDrawColor(sdlRenderer, 255, 0, 0, 255);
   SDL_RenderDrawLine(sdlRenderer, static_cast<int>(startX), static_cast<int>(startY), static_cast<int>(leftEndX), static_cast<int>(leftEndY));
   SDL_RenderDrawLine(sdlRenderer, static_cast<int>(startX), static_cast<int>(startY), static_cast<int>(rightEndX), static_cast<int>(rightEndY));
+}
+
+void RenderSystem::renderProjectiles()
+{
+  Renderer &renderer = Renderer::getInstance();
+  SDL_Renderer *sdlRenderer = renderer.getSDLRenderer();
+  EntityManager &entityManager = EntityManager::getInstance();
+  for (std::uint32_t entityId = 1; entityId < EntityManager::MAX_ENTITY_ID; ++entityId)
+  {
+    ProjectileComponent *projectile = entityManager.getProjectileComponent(entityId);
+    TransformComponent *transform = entityManager.getTransformComponent(entityId);
+    if (!projectile || !transform)
+      continue;
+    int centerX = static_cast<int>(transform->positionX);
+    int centerY = static_cast<int>(transform->positionY);
+    int radius = 4;
+    SDL_SetRenderDrawColor(sdlRenderer, 255, 255, 255, 255);
+    for (int w = 0; w < radius * 2; w++)
+    {
+      for (int h = 0; h < radius * 2; h++)
+      {
+        int dx = radius - w;
+        int dy = radius - h;
+        if (dx * dx + dy * dy <= radius * radius)
+        {
+          SDL_RenderDrawPoint(sdlRenderer, centerX + dx, centerY + dy);
+        }
+      }
+    }
+  }
 }

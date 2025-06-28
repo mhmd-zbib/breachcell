@@ -4,6 +4,7 @@
 #include "ecs/systems/movement_system.h"
 #include "ecs/systems/aiming_system.h"
 #include "ecs/systems/render_system.h"
+#include "ecs/systems/shooting_system.h"
 #include "ecs/entity_manager.h"
 #include "ecs/components.h"
 #include <stdexcept>
@@ -55,12 +56,14 @@ void Engine::setPlayerEntityId(std::uint32_t id)
   playerEntityId = id;
   MovementSystem::getInstance().setPlayerEntityId(id);
   AimingSystem::getInstance().setPlayerEntityId(id);
+  ShootingSystem::getInstance().setPlayerEntityId(id);
 }
 
 void Engine::update()
 {
   InputSystem::getInstance().update();
   AimingSystem::getInstance().update();
+  ShootingSystem::getInstance().update();
   Uint32 currentTicks = SDL_GetTicks();
   static Uint32 lastTicks = currentTicks;
   float deltaTime = (currentTicks - lastTicks) / 1000.0f;
@@ -72,6 +75,7 @@ void Engine::render()
 {
   rendererReference.clear();
   RenderSystem::getInstance().renderAll();
+  RenderSystem::getInstance().renderProjectiles();
   RenderSystem::getInstance().renderAimLine();
   rendererReference.present();
 }

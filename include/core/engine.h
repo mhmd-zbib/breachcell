@@ -6,6 +6,8 @@
 #include "input/input_handler.h"
 #include "ecs/systems/input_system.h"
 
+class ShootingSystem;
+
 class Engine
 {
 public:

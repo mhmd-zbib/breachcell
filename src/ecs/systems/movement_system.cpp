@@ -47,6 +47,25 @@ void MovementSystem::update(float deltaTime)
     transform->positionX += velocity->velocityX * deltaTime;
     transform->positionY += velocity->velocityY * deltaTime;
   }
+
+  // Update all entities by velocity
+  for (std::uint32_t entityId = 1; entityId < EntityManager::MAX_ENTITY_ID; ++entityId)
+  {
+    TransformComponent *transform = entityManager.getTransformComponent(entityId);
+    VelocityComponent *velocity = entityManager.getVelocityComponent(entityId);
+    ProjectileComponent *projectile = entityManager.getProjectileComponent(entityId);
+    if (transform && velocity)
+    {
+      transform->positionX += velocity->velocityX * deltaTime;
+      transform->positionY += velocity->velocityY * deltaTime;
+    }
+    if (projectile)
+    {
+      projectile->lifetime -= deltaTime;
+      if (projectile->lifetime <= 0.0f)
+        entityManager.destroyEntity(entityId);
+    }
+  }
 }
 
 void MovementSystem::update()

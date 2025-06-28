@@ -24,3 +24,8 @@ struct InputComponent
   bool leftPressed;
   bool rightPressed;
 };
+struct ProjectileComponent
+{
+  float lifetime;
+  float damage;
+};
