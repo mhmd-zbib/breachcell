@@ -1,7 +1,9 @@
 #include "ecs/systems/aiming_system.h"
 #include "ecs/entity_manager.h"
+#include "core/math_utils.h"
 #include <SDL2/SDL.h>
 #include <cmath>
+#include <algorithm>
 AimingSystem &AimingSystem::getInstance()
 {
   static AimingSystem instance;
@@ -16,6 +18,7 @@ void AimingSystem::update(float mouseX, float mouseY)
 {
   EntityManager &entityManager = EntityManager::getInstance();
   TransformComponent *playerTransform = entityManager.getTransformComponent(playerEntityId);
+  VelocityComponent *playerVelocity = entityManager.getVelocityComponent(playerEntityId);
   if (!playerTransform)
     return;
   float playerCenterX = playerTransform->positionX + 32.0f;
@@ -23,6 +26,11 @@ void AimingSystem::update(float mouseX, float mouseY)
   float dx = mouseX - playerCenterX;
   float dy = mouseY - playerCenterY;
   aimAngle = std::atan2(dy, dx);
+  float velocityMag = 0.0f;
+  if (playerVelocity)
+    velocityMag = MathUtils::vectorMagnitude(playerVelocity->velocityX, playerVelocity->velocityY);
+  float coneDegrees = (velocityMag < 1e-3f) ? STANDING_CONE_DEGREES : WALKING_CONE_DEGREES;
+  aimConeHalfAngle = 0.5f * MathUtils::toRadians(coneDegrees);
 }
 void AimingSystem::update()
 {
@@ -34,4 +42,8 @@ void AimingSystem::update()
 float AimingSystem::getAimAngle() const
 {
   return aimAngle;
+}
+float AimingSystem::getAimConeHalfAngle() const
+{
+  return aimConeHalfAngle;
 }

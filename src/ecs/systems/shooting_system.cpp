@@ -25,7 +25,7 @@ void ShootingSystem::update()
   static bool wasPressed = false;
   static std::mt19937 gen(std::random_device{}());
   static Uint32 lastShotTime = 0;
-  static constexpr Uint32 fireDelay = 200;
+  static constexpr Uint32 fireDelay = 100;
   bool isPressed = (SDL_GetMouseState(nullptr, nullptr) & SDL_BUTTON(SDL_BUTTON_LEFT));
   Uint32 now = SDL_GetTicks();
   if (isPressed && (now - lastShotTime >= fireDelay))
@@ -35,10 +35,10 @@ void ShootingSystem::update()
     if (!playerTransform)
       return;
     float aimAngle = AimingSystem::getInstance().getAimAngle();
-    float halfCone = 17.5f * 3.14159265f / 180.0f;
+    float halfCone = AimingSystem::getInstance().getAimConeHalfAngle();
     std::uniform_real_distribution<float> dist(aimAngle - halfCone, aimAngle + halfCone);
     float spreadAngle = dist(gen);
-    float speed = 400.0f;
+    float speed = ShootingSystem::PROJECTILE_SPEED;
     float spawnX = playerTransform->positionX + 32.0f;
     float spawnY = playerTransform->positionY + 32.0f;
     std::uint32_t projectileId = entityManager.createEntity();

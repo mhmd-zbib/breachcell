@@ -11,5 +11,6 @@ public:
 
 private:
   ShootingSystem();
+  static constexpr float PROJECTILE_SPEED = 1700.0f;
   std::uint32_t playerEntityId = 0;
 };

@@ -138,12 +138,12 @@ void RenderSystem::renderAimLine()
   if (!playerTransform)
     return;
   float angle = AimingSystem::getInstance().getAimAngle();
+  float halfCone = AimingSystem::getInstance().getAimConeHalfAngle();
   Renderer &renderer = Renderer::getInstance();
   SDL_Renderer *sdlRenderer = renderer.getSDLRenderer();
   float lineLength = 100.0f;
   float startX = playerTransform->positionX + PLAYER_TEXTURE_WIDTH / 2;
   float startY = playerTransform->positionY + PLAYER_TEXTURE_HEIGHT / 2;
-  float halfCone = 17.5f * 3.14159265f / 180.0f;
   float leftAngle = angle - halfCone;
   float rightAngle = angle + halfCone;
   float leftEndX = startX + std::cos(leftAngle) * lineLength;
