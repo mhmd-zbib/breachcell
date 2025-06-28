@@ -28,4 +28,42 @@ struct ProjectileComponent
 {
   float lifetime;
   float damage;
+  std::uint32_t ownerId;
+};
+struct CollisionComponent
+{
+  float boxX;
+  float boxY;
+  float boxWidth;
+  float boxHeight;
+};
+struct HealthComponent
+{
+  float value;
+  float minValue;
+  float maxValue;
+  void increment(float amount)
+  {
+    value += amount;
+    if (value > maxValue)
+      value = maxValue;
+  }
+  void decrement(float amount)
+  {
+    value -= amount;
+    if (value < minValue)
+      value = minValue;
+  }
+  float getValue() const
+  {
+    return value;
+  }
+  float getMaxValue() const
+  {
+    return maxValue;
+  }
+  float getMinValue() const
+  {
+    return minValue;
+  }
 };

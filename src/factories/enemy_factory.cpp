@@ -7,7 +7,7 @@ EnemyFactory &EnemyFactory::getInstance()
   static EnemyFactory instance;
   return instance;
 }
-std::uint32_t EnemyFactory::createEnemy(float positionX, float positionY, float rotation, float scale, std::uint32_t textureId, int drawOrder)
+std::uint32_t EnemyFactory::createEnemy(float positionX, float positionY, float rotation, float scale, std::uint32_t textureId, int drawOrder, float maxHealth)
 {
   if (scale <= 0.0f)
     throw std::invalid_argument("EnemyFactory: scale must be positive");
@@ -16,8 +16,12 @@ std::uint32_t EnemyFactory::createEnemy(float positionX, float positionY, float 
   TransformComponent enemyTransform{positionX, positionY, rotation, scale};
   VelocityComponent enemyVelocity{0.0f, 0.0f};
   SpriteComponent enemySprite{textureId, drawOrder};
+  CollisionComponent enemyCollision{positionX, positionY, 32.0f, 32.0f};
+  HealthComponent enemyHealth{maxHealth, 0.0f, maxHealth};
   entityManager.addTransformComponent(enemyEntityId, enemyTransform);
   entityManager.addVelocityComponent(enemyEntityId, enemyVelocity);
   entityManager.addSpriteComponent(enemyEntityId, enemySprite);
+  entityManager.addCollisionComponent(enemyEntityId, enemyCollision);
+  entityManager.addHealthComponent(enemyEntityId, enemyHealth);
   return enemyEntityId;
 }

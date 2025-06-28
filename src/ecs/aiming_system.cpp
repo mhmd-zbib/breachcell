@@ -104,7 +104,7 @@ void AimingSystem::update(float mouseX, float mouseY)
   else
     currentConeDegrees += (delta > 0 ? 1 : -1) * transitionSpeed;
   aimConeHalfAngle = 0.5f * MathUtils::toRadians(currentConeDegrees);
-  lastVelocityMag = velocityMagnitude;
+  lastVelocityMagnitude = velocityMagnitude;
 }
 void AimingSystem::update()
 {

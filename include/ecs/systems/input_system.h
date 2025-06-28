@@ -5,9 +5,11 @@ class InputSystem
 public:
   static InputSystem &getInstance();
   void update();
-  void setRunning(bool &running);
+  void setRunning(bool &runningFlag);
 
 private:
   InputSystem();
-  bool *runningPtr = nullptr;
+  InputSystem(const InputSystem &) = delete;
+  InputSystem &operator=(const InputSystem &) = delete;
+  bool *runningFlagPointer = nullptr;
 };

@@ -5,6 +5,8 @@
 #include "core/engine.h"
 #include <SDL2/SDL.h>
 #include <random>
+#include "factories/projectile_factory.h"
+#include "ecs/systems/aiming_system.h"
 
 ShootingSystem &ShootingSystem::getInstance()
 {
@@ -42,13 +44,14 @@ void ShootingSystem::update()
     float speed = ShootingSystem::PROJECTILE_SPEED;
     float spawnX = playerTransform->positionX + 32.0f;
     float spawnY = playerTransform->positionY + 32.0f;
-    std::uint32_t projectileId = entityManager.createEntity();
-    TransformComponent projectileTransform{spawnX, spawnY, spreadAngle, 1.0f};
-    VelocityComponent projectileVelocity{std::cos(spreadAngle) * speed, std::sin(spreadAngle) * speed};
-    ProjectileComponent projectileData{1.5f, 10.0f};
-    entityManager.addTransformComponent(projectileId, projectileTransform);
-    entityManager.addVelocityComponent(projectileId, projectileVelocity);
-    entityManager.addProjectileComponent(projectileId, projectileData);
+    float velocityX = std::cos(spreadAngle) * speed;
+    float velocityY = std::sin(spreadAngle) * speed;
+    float width = 8.0f;
+    float height = 8.0f;
+    float lifetime = 1.5f;
+    std::string textureId = "projectile";
+    ProjectileFactory::getInstance().createProjectile(
+        spawnX, spawnY, velocityX, velocityY, width, height, lifetime, textureId, playerEntityId);
     lastShotTime = now;
     AimingSystem::getInstance().triggerPostShotConeExpansion();
   }

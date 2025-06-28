@@ -16,6 +16,8 @@ void EntityManager::destroyEntity(std::uint32_t entityId)
   spriteComponents.erase(entityId);
   inputComponents.erase(entityId);
   projectileComponents.erase(entityId);
+  collisionComponents.erase(entityId);
+  healthComponents.erase(entityId);
 }
 TransformComponent *EntityManager::getTransformComponent(std::uint32_t entityId)
 {
@@ -52,6 +54,20 @@ ProjectileComponent *EntityManager::getProjectileComponent(std::uint32_t entityI
     return &it->second;
   return nullptr;
 }
+CollisionComponent *EntityManager::getCollisionComponent(std::uint32_t entityId)
+{
+  auto it = collisionComponents.find(entityId);
+  if (it != collisionComponents.end())
+    return &it->second;
+  return nullptr;
+}
+HealthComponent *EntityManager::getHealthComponent(std::uint32_t entityId)
+{
+  auto it = healthComponents.find(entityId);
+  if (it != healthComponents.end())
+    return &it->second;
+  return nullptr;
+}
 void EntityManager::addTransformComponent(std::uint32_t entityId, const TransformComponent &component)
 {
   transformComponents[entityId] = component;
@@ -71,4 +87,12 @@ void EntityManager::addInputComponent(std::uint32_t entityId, const InputCompone
 void EntityManager::addProjectileComponent(std::uint32_t entityId, const ProjectileComponent &component)
 {
   projectileComponents[entityId] = component;
+}
+void EntityManager::addCollisionComponent(std::uint32_t entityId, const CollisionComponent &component)
+{
+  collisionComponents[entityId] = component;
+}
+void EntityManager::addHealthComponent(std::uint32_t entityId, const HealthComponent &component)
+{
+  healthComponents[entityId] = component;
 }

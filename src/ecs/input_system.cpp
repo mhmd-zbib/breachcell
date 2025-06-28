@@ -6,12 +6,12 @@ InputSystem &InputSystem::getInstance()
   return instance;
 }
 InputSystem::InputSystem() {}
-void InputSystem::setRunning(bool &running)
+void InputSystem::setRunning(bool &runningFlag)
 {
-  runningPtr = &running;
+  runningFlagPointer = &runningFlag;
 }
 void InputSystem::update()
 {
-  if (runningPtr)
-    InputHandler::getInstance().handleInput(*runningPtr);
+  if (runningFlagPointer)
+    InputHandler::getInstance().handleInput(*runningFlagPointer);
 }

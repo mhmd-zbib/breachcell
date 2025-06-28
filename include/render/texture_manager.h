@@ -7,7 +7,7 @@ class TextureManager
 {
 public:
   static TextureManager &getInstance();
-  void loadTexture(std::uint32_t textureId, const std::string &filePath, SDL_Renderer *renderer);
+  void loadTexture(std::uint32_t textureId, const std::string &filePath, SDL_Renderer *rendererPointer);
   SDL_Texture *getTexture(std::uint32_t textureId) const;
   void unloadAll();
 

@@ -11,6 +11,9 @@
 #include "render/texture_manager.h"
 #include "factories/player_factory.h"
 #include "factories/enemy_factory.h"
+#include "factories/wall_factory.h"
+#include "ecs/systems/collision_system.h"
+#include "ecs/systems/health_system.h"
 #include <stdexcept>
 #include <iostream>
 
@@ -66,6 +69,8 @@ void Engine::update()
   float deltaTime = (currentTicks - lastTicks) / 1000.0f;
   lastTicks = currentTicks;
   MovementSystem::getInstance().update(deltaTime);
+  CollisionSystem::getInstance().update();
+  HealthSystem::getInstance().update();
 }
 
 void Engine::render()
@@ -92,6 +97,7 @@ void Engine::createEntities()
   std::uint32_t playerEntityId = PlayerFactory::getInstance().createPlayer(400.0f, 300.0f, 0.0f, 1.0f, 1, 0);
   setPlayerEntityId(playerEntityId);
   EnemyFactory::getInstance().createEnemy(200.0f, 200.0f, 0.0f, 1.0f, 2, 1);
+  WallFactory::getInstance().createWall(100.0f, 100.0f, 32.0f, 32.0f, 2);
 }
 
 void Engine::setPlayerEntityId(std::uint32_t id)

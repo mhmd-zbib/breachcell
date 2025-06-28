@@ -2,6 +2,8 @@
 #include "render/entity_renderer.h"
 #include "render/projectile_renderer.h"
 #include "render/aiming_renderer.h"
+#include "render/wall_renderer.h"
+#include "ecs/systems/collision_system.h"
 
 CoreRenderSystem &CoreRenderSystem::getInstance()
 {
@@ -26,4 +28,6 @@ void CoreRenderSystem::renderAll()
   EntityRenderer::getInstance().render();
   ProjectileRenderer::getInstance().render();
   AimingRenderer::getInstance().render();
+  WallRenderer::getInstance().render();
+  CollisionSystem::getInstance().renderDebug();
 }
