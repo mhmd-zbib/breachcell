@@ -1,62 +1,59 @@
 #include "core/engine.h"
-#include "render/renderer.h"
 #include "input/input_handler.h"
+#include "render/renderer.h"
 #include "ecs/systems/movement_system.h"
 #include "ecs/systems/aiming_system.h"
-#include "ecs/systems/render_system.h"
 #include "ecs/systems/shooting_system.h"
+#include "ecs/systems/input_system.h"
 #include "ecs/entity_manager.h"
 #include "ecs/components.h"
+#include "render/core_render_system.h"
+#include "render/texture_manager.h"
+#include "factories/player_factory.h"
+#include "factories/enemy_factory.h"
 #include <stdexcept>
 #include <iostream>
 
-Engine::Engine(InputHandler &inputHandler, Renderer &renderer)
-    : inputHandlerReference(inputHandler), rendererReference(renderer), window(nullptr), running(false) {}
-
-Engine &Engine::getInstance(InputHandler &inputHandler, Renderer &renderer)
+Engine &Engine::getInstance()
 {
-  static Engine instance(inputHandler, renderer);
+  static Engine instance;
   return instance;
 }
 
+Engine::Engine() : running(false), inputHandler(nullptr), renderer(nullptr), window(nullptr) {}
+
 bool Engine::init(const char *windowTitle, int windowWidth, int windowHeight)
 {
+  inputHandler = &InputHandler::getInstance();
+  renderer = &Renderer::getInstance();
   if (SDL_Init(SDL_INIT_VIDEO) != 0)
     throw std::runtime_error("SDL initialization failed");
   window = SDL_CreateWindow(windowTitle, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, windowWidth, windowHeight, SDL_WINDOW_SHOWN);
-  std::cout << "SDL_CreateWindow returned: " << window << std::endl;
   if (!window)
-  {
-    std::cerr << "Window creation failed: " << SDL_GetError() << std::endl;
     throw std::runtime_error("Window creation failed");
-  }
-  if (!rendererReference.init(window))
-  {
-    std::cerr << "Renderer initialization failed: " << SDL_GetError() << std::endl;
+  if (!renderer->init(window))
     throw std::runtime_error("Renderer initialization failed");
-  }
-  std::cout << "Renderer pointer: " << rendererReference.getSDLRenderer() << std::endl;
+  TextureManager::getInstance().loadTexture(1, "assets/player.png", renderer->getSDLRenderer());
+  TextureManager::getInstance().loadTexture(2, "assets/enemy.png", renderer->getSDLRenderer());
+  createEntities();
   running = true;
-  InputSystem::getInstance().setRunning(running);
   return true;
 }
 
-bool Engine::isRunning() const
+void Engine::run()
 {
-  return running;
+  while (running)
+  {
+    handleInput();
+    update();
+    render();
+    SDL_Delay(16);
+  }
 }
 
 void Engine::handleInput()
 {
-  inputHandlerReference.handleInput(running);
-}
-
-void Engine::setPlayerEntityId(std::uint32_t id)
-{
-  playerEntityId = id;
-  MovementSystem::getInstance().setPlayerEntityId(id);
-  AimingSystem::getInstance().setPlayerEntityId(id);
-  ShootingSystem::getInstance().setPlayerEntityId(id);
+  inputHandler->handleInput(running);
 }
 
 void Engine::update()
@@ -73,11 +70,10 @@ void Engine::update()
 
 void Engine::render()
 {
-  rendererReference.clear();
-  RenderSystem::getInstance().renderAll();
-  RenderSystem::getInstance().renderProjectiles();
-  RenderSystem::getInstance().renderAimLine();
-  rendererReference.present();
+  renderer->clear();
+  CoreRenderSystem::getInstance().setRenderer(renderer->getSDLRenderer());
+  CoreRenderSystem::getInstance().renderAll();
+  renderer->present();
 }
 
 void Engine::clean()
@@ -89,4 +85,24 @@ void Engine::clean()
   }
   SDL_Quit();
   running = false;
+}
+
+void Engine::createEntities()
+{
+  std::uint32_t playerEntityId = PlayerFactory::getInstance().createPlayer(400.0f, 300.0f, 0.0f, 1.0f, 1, 0);
+  setPlayerEntityId(playerEntityId);
+  EnemyFactory::getInstance().createEnemy(200.0f, 200.0f, 0.0f, 1.0f, 2, 1);
+}
+
+void Engine::setPlayerEntityId(std::uint32_t id)
+{
+  playerEntityId = id;
+  MovementSystem::getInstance().setPlayerEntityId(id);
+  AimingSystem::getInstance().setPlayerEntityId(id);
+  ShootingSystem::getInstance().setPlayerEntityId(id);
+}
+
+std::uint32_t Engine::getPlayerEntityId() const
+{
+  return playerEntityId;
 }

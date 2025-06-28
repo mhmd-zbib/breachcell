@@ -1,0 +1,36 @@
+#include "render/aiming_renderer.h"
+#include "core/engine.h"
+#include "ecs/systems/aiming_system.h"
+#include "ecs/entity_manager.h"
+#include "ecs/components.h"
+#include "render/core_render_system.h"
+#include <SDL2/SDL.h>
+#include <cmath>
+AimingRenderer &AimingRenderer::getInstance()
+{
+  static AimingRenderer instance;
+  return instance;
+}
+void AimingRenderer::render()
+{
+  std::uint32_t playerId = Engine::getInstance().getPlayerEntityId();
+  EntityManager &entityManager = EntityManager::getInstance();
+  TransformComponent *playerTransform = entityManager.getTransformComponent(playerId);
+  if (!playerTransform)
+    return;
+  float angle = AimingSystem::getInstance().getAimAngle();
+  float halfCone = AimingSystem::getInstance().getAimConeHalfAngle();
+  SDL_Renderer *renderer = CoreRenderSystem::getInstance().getRenderer();
+  float lineLength = 400.0f;
+  float startX = playerTransform->positionX + 32.0f;
+  float startY = playerTransform->positionY + 32.0f;
+  float leftAngle = angle - halfCone;
+  float rightAngle = angle + halfCone;
+  float leftEndX = startX + std::cos(leftAngle) * lineLength;
+  float leftEndY = startY + std::sin(leftAngle) * lineLength;
+  float rightEndX = startX + std::cos(rightAngle) * lineLength;
+  float rightEndY = startY + std::sin(rightAngle) * lineLength;
+  SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
+  SDL_RenderDrawLine(renderer, static_cast<int>(startX), static_cast<int>(startY), static_cast<int>(leftEndX), static_cast<int>(leftEndY));
+  SDL_RenderDrawLine(renderer, static_cast<int>(startX), static_cast<int>(startY), static_cast<int>(rightEndX), static_cast<int>(rightEndY));
+}
