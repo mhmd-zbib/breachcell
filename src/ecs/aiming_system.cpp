@@ -45,14 +45,24 @@ void AimingSystem::update(float mouseX, float mouseY)
   float playerCenterY = playerTransform->positionY + 32.0f;
   float dx = mouseX - playerCenterX;
   float dy = mouseY - playerCenterY;
-  aimAngle = std::atan2(dy, dx);
+  float newAimAngle = std::atan2(dy, dx);
+  if (std::abs(newAimAngle - aimAngle) > MathUtils::PI)
+  {
+    if (newAimAngle > aimAngle)
+      aimAngle += 2 * MathUtils::PI;
+    else
+      aimAngle -= 2 * MathUtils::PI;
+  }
+  float aimLerpSpeed = 20.0f;
+  aimAngle += (newAimAngle - aimAngle) * std::clamp(aimLerpSpeed * 0.016f, 0.0f, 1.0f);
   float velocityMagnitude = playerVelocity ? MathUtils::vectorMagnitude(playerVelocity->velocityX, playerVelocity->velocityY) : 0.0f;
   InputHandler &inputHandler = InputHandler::getInstance();
+  static Uint32 lastUpdateTicks = 0;
   Uint32 now = SDL_GetTicks();
   float deltaTime = 0.016f;
-  if (lastUpdateTime > 0.0f)
-    deltaTime = (now - lastUpdateTime) / 1000.0f;
-  lastUpdateTime = now;
+  if (lastUpdateTicks > 0)
+    deltaTime = std::min((now - lastUpdateTicks) / 1000.0f, 0.033f);
+  lastUpdateTicks = now;
   bool isStanding = velocityMagnitude < 1e-3f;
   static bool wasShooting = false;
   bool shooting = isShooting;

@@ -16,14 +16,20 @@ void AimingRenderer::render()
   std::uint32_t playerId = Engine::getInstance().getPlayerEntityId();
   EntityManager &entityManager = EntityManager::getInstance();
   TransformComponent *playerTransform = entityManager.getTransformComponent(playerId);
+  CollisionComponent *collision = entityManager.getCollisionComponent(playerId);
   if (!playerTransform)
     return;
   float angle = AimingSystem::getInstance().getAimAngle();
   float halfCone = AimingSystem::getInstance().getAimConeHalfAngle();
   SDL_Renderer *renderer = CoreRenderSystem::getInstance().getRenderer();
   float lineLength = 400.0f;
-  float startX = playerTransform->positionX + 32.0f;
-  float startY = playerTransform->positionY + 32.0f;
+  float startX = playerTransform->positionX;
+  float startY = playerTransform->positionY;
+  if (collision)
+  {
+    startX = collision->centerX;
+    startY = collision->centerY;
+  }
   float leftAngle = angle - halfCone;
   float rightAngle = angle + halfCone;
   float leftEndX = startX + std::cos(leftAngle) * lineLength;

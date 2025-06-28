@@ -15,11 +15,15 @@ std::uint32_t PlayerFactory::createPlayer(float positionX, float positionY, floa
     throw std::invalid_argument("PlayerFactory: scale must be positive");
   EntityManager &entityManager = EntityManager::getInstance();
   std::uint32_t playerEntityId = entityManager.createEntity();
+  float spriteWidth = 64.0f;
+  float spriteHeight = 64.0f;
   TransformComponent playerTransform{positionX, positionY, rotation, scale};
   VelocityComponent playerVelocity{0.0f, 0.0f};
   SpriteComponent playerSprite{textureId, drawOrder};
   InputComponent playerInput{false, false, false, false};
-  CollisionComponent playerCollision{positionX, positionY, 32.0f, 32.0f};
+  float collisionWidth = spriteWidth;
+  float collisionHeight = spriteHeight;
+  CollisionComponent playerCollision = CollisionComponent::createCentered(positionX, positionY, collisionWidth, collisionHeight);
   entityManager.addTransformComponent(playerEntityId, playerTransform);
   entityManager.addVelocityComponent(playerEntityId, playerVelocity);
   entityManager.addSpriteComponent(playerEntityId, playerSprite);

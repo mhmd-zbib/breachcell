@@ -13,10 +13,14 @@ std::uint32_t EnemyFactory::createEnemy(float positionX, float positionY, float 
     throw std::invalid_argument("EnemyFactory: scale must be positive");
   EntityManager &entityManager = EntityManager::getInstance();
   std::uint32_t enemyEntityId = entityManager.createEntity();
+  float spriteWidth = 64.0f;
+  float spriteHeight = 64.0f;
   TransformComponent enemyTransform{positionX, positionY, rotation, scale};
   VelocityComponent enemyVelocity{0.0f, 0.0f};
   SpriteComponent enemySprite{textureId, drawOrder};
-  CollisionComponent enemyCollision{positionX, positionY, 32.0f, 32.0f};
+  float collisionWidth = spriteWidth;
+  float collisionHeight = spriteHeight;
+  CollisionComponent enemyCollision = CollisionComponent::createCentered(positionX, positionY, collisionWidth, collisionHeight);
   HealthComponent enemyHealth{maxHealth, 0.0f, maxHealth};
   entityManager.addTransformComponent(enemyEntityId, enemyTransform);
   entityManager.addVelocityComponent(enemyEntityId, enemyVelocity);

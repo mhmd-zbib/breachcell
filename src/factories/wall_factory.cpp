@@ -17,7 +17,7 @@ std::uint32_t WallFactory::createWall(float positionX, float positionY, float wi
   std::uint32_t wallEntityId = entityManager.createEntity();
   TransformComponent wallTransform{positionX, positionY, 0.0f, 1.0f};
   SpriteComponent wallSprite{0, drawOrder};
-  CollisionComponent wallCollision{positionX, positionY, width, height};
+  CollisionComponent wallCollision = CollisionComponent::createCentered(positionX, positionY, width, height);
   entityManager.addTransformComponent(wallEntityId, wallTransform);
   entityManager.addSpriteComponent(wallEntityId, wallSprite);
   entityManager.addCollisionComponent(wallEntityId, wallCollision);

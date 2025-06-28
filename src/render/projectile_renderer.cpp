@@ -16,22 +16,21 @@ void ProjectileRenderer::render()
   {
     ProjectileComponent *projectile = entityManager.getProjectileComponent(entityId);
     TransformComponent *transform = entityManager.getTransformComponent(entityId);
+    CollisionComponent *collision = entityManager.getCollisionComponent(entityId);
     if (!projectile || !transform)
       continue;
-    int centerX = static_cast<int>(transform->positionX);
-    int centerY = static_cast<int>(transform->positionY);
+    float centerX = transform->positionX;
+    float centerY = transform->positionY;
     int radius = 4;
+    if (collision)
+      radius = static_cast<int>(collision->boxWidth * 0.5f);
     SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
-    for (int w = 0; w < radius * 2; w++)
+    for (int w = -radius; w <= radius; w++)
     {
-      for (int h = 0; h < radius * 2; h++)
+      for (int h = -radius; h <= radius; h++)
       {
-        int dx = radius - w;
-        int dy = radius - h;
-        if (dx * dx + dy * dy <= radius * radius)
-        {
-          SDL_RenderDrawPoint(renderer, centerX + dx, centerY + dy);
-        }
+        if (w * w + h * h <= radius * radius)
+          SDL_RenderDrawPoint(renderer, static_cast<int>(centerX) + w, static_cast<int>(centerY) + h);
       }
     }
   }

@@ -35,6 +35,7 @@ void ShootingSystem::update()
   {
     EntityManager &entityManager = EntityManager::getInstance();
     TransformComponent *playerTransform = entityManager.getTransformComponent(playerEntityId);
+    CollisionComponent *playerCollision = entityManager.getCollisionComponent(playerEntityId);
     if (!playerTransform)
       return;
     float aimAngle = AimingSystem::getInstance().getAimAngle();
@@ -42,8 +43,19 @@ void ShootingSystem::update()
     std::uniform_real_distribution<float> dist(aimAngle - preShotHalfCone, aimAngle + preShotHalfCone);
     float spreadAngle = dist(gen);
     float speed = ShootingSystem::PROJECTILE_SPEED;
-    float spawnX = playerTransform->positionX + 32.0f;
-    float spawnY = playerTransform->positionY + 32.0f;
+    float spawnX = playerTransform->positionX;
+    float spawnY = playerTransform->positionY;
+    float offsetDistance = 0.0f;
+    float projectileRadius = 4.0f;
+    if (playerCollision)
+    {
+      spawnX = playerCollision->centerX;
+      spawnY = playerCollision->centerY;
+      float playerRadius = 0.5f * std::max(playerCollision->boxWidth, playerCollision->boxHeight);
+      offsetDistance = playerRadius + projectileRadius + 1.0f;
+      spawnX += std::cos(spreadAngle) * offsetDistance;
+      spawnY += std::sin(spreadAngle) * offsetDistance;
+    }
     float velocityX = std::cos(spreadAngle) * speed;
     float velocityY = std::sin(spreadAngle) * speed;
     float width = 8.0f;

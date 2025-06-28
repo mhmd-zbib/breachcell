@@ -52,8 +52,8 @@ void MovementSystem::update(float deltaTime)
     VelocityComponent *velocity = entityManager.getVelocityComponent(entityId);
     if (projectile && collision && transform && velocity)
     {
-      float intendedX = transform->positionX + velocity->velocityX * deltaTime;
-      float intendedY = transform->positionY + velocity->velocityY * deltaTime;
+      float intendedCenterX = transform->positionX + velocity->velocityX * deltaTime;
+      float intendedCenterY = transform->positionY + velocity->velocityY * deltaTime;
       bool hit = false;
       for (std::uint32_t otherId = 1; otherId < EntityManager::MAX_ENTITY_ID; ++otherId)
       {
@@ -64,10 +64,11 @@ void MovementSystem::update(float deltaTime)
           continue;
         if (projectile->ownerId == otherId)
           continue;
-        bool overlap = intendedX < otherCollision->boxX + otherCollision->boxWidth &&
-                       intendedX + collision->boxWidth > otherCollision->boxX &&
-                       intendedY < otherCollision->boxY + otherCollision->boxHeight &&
-                       intendedY + collision->boxHeight > otherCollision->boxY;
+        bool overlap =
+            collision->getMinX() + velocity->velocityX * deltaTime < otherCollision->getMaxX() &&
+            collision->getMaxX() + velocity->velocityX * deltaTime > otherCollision->getMinX() &&
+            collision->getMinY() + velocity->velocityY * deltaTime < otherCollision->getMaxY() &&
+            collision->getMaxY() + velocity->velocityY * deltaTime > otherCollision->getMinY();
         if (overlap)
         {
           hit = true;
@@ -79,19 +80,21 @@ void MovementSystem::update(float deltaTime)
         entityManager.destroyEntity(entityId);
         continue;
       }
-      transform->positionX = intendedX;
-      transform->positionY = intendedY;
-      collision->boxX = transform->positionX;
-      collision->boxY = transform->positionY;
+      transform->positionX = intendedCenterX;
+      transform->positionY = intendedCenterY;
+      collision->centerX = intendedCenterX;
+      collision->centerY = intendedCenterY;
     }
     else if (transform && velocity && collision && !projectile)
     {
       float previousX = transform->positionX;
       float previousY = transform->positionY;
-      transform->positionX += velocity->velocityX * deltaTime;
-      transform->positionY += velocity->velocityY * deltaTime;
-      collision->boxX = transform->positionX;
-      collision->boxY = transform->positionY;
+      float intendedCenterX = previousX + velocity->velocityX * deltaTime;
+      float intendedCenterY = previousY + velocity->velocityY * deltaTime;
+      collision->centerX = intendedCenterX;
+      collision->centerY = intendedCenterY;
+      transform->positionX = intendedCenterX;
+      transform->positionY = intendedCenterY;
       bool blocked = false;
       for (std::uint32_t otherId = 1; otherId < EntityManager::MAX_ENTITY_ID; ++otherId)
       {
@@ -100,10 +103,11 @@ void MovementSystem::update(float deltaTime)
         CollisionComponent *otherCollision = entityManager.getCollisionComponent(otherId);
         if (!otherCollision)
           continue;
-        bool overlap = collision->boxX < otherCollision->boxX + otherCollision->boxWidth &&
-                       collision->boxX + collision->boxWidth > otherCollision->boxX &&
-                       collision->boxY < otherCollision->boxY + otherCollision->boxHeight &&
-                       collision->boxY + collision->boxHeight > otherCollision->boxY;
+        bool overlap =
+            collision->getMinX() < otherCollision->getMaxX() &&
+            collision->getMaxX() > otherCollision->getMinX() &&
+            collision->getMinY() < otherCollision->getMaxY() &&
+            collision->getMaxY() > otherCollision->getMinY();
         if (overlap)
         {
           blocked = true;
@@ -114,8 +118,8 @@ void MovementSystem::update(float deltaTime)
       {
         transform->positionX = previousX;
         transform->positionY = previousY;
-        collision->boxX = previousX;
-        collision->boxY = previousY;
+        collision->centerX = previousX;
+        collision->centerY = previousY;
       }
     }
     else if (transform && velocity)

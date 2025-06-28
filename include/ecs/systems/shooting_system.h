@@ -12,6 +12,6 @@ private:
   ShootingSystem();
   ShootingSystem(const ShootingSystem &) = delete;
   ShootingSystem &operator=(const ShootingSystem &) = delete;
-  static constexpr float PROJECTILE_SPEED = 1700.0f;
+  static constexpr float PROJECTILE_SPEED = 400.0f;
   std::uint32_t playerEntityId = 0;
 };
