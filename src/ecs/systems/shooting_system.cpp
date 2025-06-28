@@ -27,6 +27,7 @@ void ShootingSystem::update()
   static Uint32 lastShotTime = 0;
   static constexpr Uint32 fireDelay = 100;
   bool isPressed = (SDL_GetMouseState(nullptr, nullptr) & SDL_BUTTON(SDL_BUTTON_LEFT));
+  AimingSystem::getInstance().setShooting(isPressed);
   Uint32 now = SDL_GetTicks();
   if (isPressed && (now - lastShotTime >= fireDelay))
   {
@@ -35,8 +36,8 @@ void ShootingSystem::update()
     if (!playerTransform)
       return;
     float aimAngle = AimingSystem::getInstance().getAimAngle();
-    float halfCone = AimingSystem::getInstance().getAimConeHalfAngle();
-    std::uniform_real_distribution<float> dist(aimAngle - halfCone, aimAngle + halfCone);
+    float preShotHalfCone = AimingSystem::getInstance().getAimConeHalfAngle();
+    std::uniform_real_distribution<float> dist(aimAngle - preShotHalfCone, aimAngle + preShotHalfCone);
     float spreadAngle = dist(gen);
     float speed = ShootingSystem::PROJECTILE_SPEED;
     float spawnX = playerTransform->positionX + 32.0f;
@@ -49,6 +50,7 @@ void ShootingSystem::update()
     entityManager.addVelocityComponent(projectileId, projectileVelocity);
     entityManager.addProjectileComponent(projectileId, projectileData);
     lastShotTime = now;
+    AimingSystem::getInstance().triggerPostShotConeExpansion();
   }
   wasPressed = isPressed;
 }
