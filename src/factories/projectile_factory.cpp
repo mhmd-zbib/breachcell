@@ -2,6 +2,7 @@
 #include "ecs/entity_manager.h"
 #include "ecs/components.h"
 #include <stdexcept>
+#include <iostream>
 
 ProjectileFactory &ProjectileFactory::getInstance()
 {
@@ -26,21 +27,17 @@ std::uint32_t ProjectileFactory::createProjectile(float positionX, float positio
   validateParameters(positionX, positionY, velocityX, velocityY, width, height, lifetime, textureId);
   EntityManager &entityManager = EntityManager::getInstance();
   std::uint32_t entityId = entityManager.createEntity();
-  TransformComponent transform;
-  transform.positionX = positionX;
-  transform.positionY = positionY;
-  entityManager.addTransformComponent(entityId, transform);
-  VelocityComponent velocity;
-  velocity.velocityX = velocityX;
-  velocity.velocityY = velocityY;
-  entityManager.addVelocityComponent(entityId, velocity);
-  CollisionComponent collision = CollisionComponent::createCentered(0.0f, 0.0f, width, height);
-  entityManager.addCollisionComponent(entityId, collision);
+  TransformComponent transform{positionX, positionY, 0.0f, 1.0f};
+  VelocityComponent velocity{velocityX, velocityY};
   ProjectileComponent projectile;
   projectile.lifetime = lifetime;
   projectile.damage = 0.0f;
   projectile.ownerId = ownerId;
+  projectile.framesAlive = 0;
+  entityManager.addTransformComponent(entityId, transform);
+  entityManager.addVelocityComponent(entityId, velocity);
   entityManager.addProjectileComponent(entityId, projectile);
+  std::cout << "ProjectileFactory: Created projectile entity " << entityId << " at (" << positionX << ", " << positionY << ") with velocity (" << velocityX << ", " << velocityY << ") and ownerId " << ownerId << std::endl;
   return entityId;
 }
 

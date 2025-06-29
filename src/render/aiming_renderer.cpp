@@ -18,7 +18,6 @@ void AimingRenderer::render()
   EntityManager &entityManager = EntityManager::getInstance();
   SDL_Rect cameraView = CameraService::getInstance().getViewRectangle();
   TransformComponent *playerTransform = entityManager.getTransformComponent(playerId);
-  CollisionComponent *collision = entityManager.getCollisionComponent(playerId);
   AimComponent *aim = entityManager.getAimComponent(playerId);
   if (!playerTransform || !aim)
     return;
@@ -28,11 +27,6 @@ void AimingRenderer::render()
   float lineLength = 400.0f;
   float startX = playerTransform->positionX;
   float startY = playerTransform->positionY;
-  if (collision)
-  {
-    startX += collision->offsetX;
-    startY += collision->offsetY;
-  }
   startX -= cameraView.x;
   startY -= cameraView.y;
   float leftAngle = angle - halfCone;

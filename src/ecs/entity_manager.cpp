@@ -1,4 +1,5 @@
 #include "ecs/entity_manager.h"
+
 EntityManager &EntityManager::getInstance()
 {
   static EntityManager instance;
@@ -16,7 +17,6 @@ void EntityManager::destroyEntity(std::uint32_t entityId)
   spriteComponents.erase(entityId);
   inputComponents.erase(entityId);
   projectileComponents.erase(entityId);
-  collisionComponents.erase(entityId);
   healthComponents.erase(entityId);
   aimComponents.erase(entityId);
 }
@@ -52,13 +52,6 @@ ProjectileComponent *EntityManager::getProjectileComponent(std::uint32_t entityI
 {
   auto it = projectileComponents.find(entityId);
   if (it != projectileComponents.end())
-    return &it->second;
-  return nullptr;
-}
-CollisionComponent *EntityManager::getCollisionComponent(std::uint32_t entityId)
-{
-  auto it = collisionComponents.find(entityId);
-  if (it != collisionComponents.end())
     return &it->second;
   return nullptr;
 }
@@ -102,10 +95,6 @@ void EntityManager::addInputComponent(std::uint32_t entityId, const InputCompone
 void EntityManager::addProjectileComponent(std::uint32_t entityId, const ProjectileComponent &component)
 {
   projectileComponents[entityId] = component;
-}
-void EntityManager::addCollisionComponent(std::uint32_t entityId, const CollisionComponent &component)
-{
-  collisionComponents[entityId] = component;
 }
 void EntityManager::addHealthComponent(std::uint32_t entityId, const HealthComponent &component)
 {

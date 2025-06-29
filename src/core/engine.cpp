@@ -12,7 +12,6 @@
 #include "factories/player_factory.h"
 #include "factories/enemy_factory.h"
 #include "factories/wall_factory.h"
-#include "ecs/systems/collision_system.h"
 #include "ecs/systems/health_system.h"
 #include "core/camera_service.h"
 #include <stdexcept>
@@ -79,7 +78,6 @@ void Engine::update()
   InputSystem::getInstance().update();
   AimingSystem::getInstance().update(playerEntityId);
   ShootingSystem::getInstance().update(playerEntityId);
-  CollisionSystem::getInstance().update();
   HealthSystem::getInstance().update();
 }
 
@@ -112,7 +110,6 @@ void Engine::createEntities()
 
 void Engine::setPlayerEntityId(std::uint32_t id)
 {
-  std::printf("Engine::setPlayerEntityId called with id: %u\n", id);
   playerEntityId = id;
   CameraService::getInstance().setTargetEntityId(id);
 }

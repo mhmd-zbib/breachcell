@@ -4,11 +4,13 @@
 #include "render/core_render_system.h"
 #include "core/camera_service.h"
 #include <SDL2/SDL.h>
+
 ProjectileRenderer &ProjectileRenderer::getInstance()
 {
   static ProjectileRenderer instance;
   return instance;
 }
+
 void ProjectileRenderer::render()
 {
   SDL_Renderer *renderer = CoreRenderSystem::getInstance().getRenderer();
@@ -18,15 +20,12 @@ void ProjectileRenderer::render()
   {
     ProjectileComponent *projectile = entityManager.getProjectileComponent(entityId);
     TransformComponent *transform = entityManager.getTransformComponent(entityId);
-    CollisionComponent *collision = entityManager.getCollisionComponent(entityId);
     if (!projectile || !transform)
       continue;
-    float centerX = transform->positionX + (collision ? collision->offsetX : 0.0f) - cameraView.x;
-    float centerY = transform->positionY + (collision ? collision->offsetY : 0.0f) - cameraView.y;
+    float centerX = transform->positionX - cameraView.x;
+    float centerY = transform->positionY - cameraView.y;
     int radius = 4;
-    if (collision)
-      radius = static_cast<int>(collision->boxWidth * 0.5f);
-    SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+    SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255); // Red color for visibility
     for (int w = -radius; w <= radius; w++)
     {
       for (int h = -radius; h <= radius; h++)

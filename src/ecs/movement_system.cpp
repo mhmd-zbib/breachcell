@@ -2,6 +2,7 @@
 #include "ecs/entity_manager.h"
 #include "input/input_handler.h"
 #include <cmath>
+#include <iostream>
 
 MovementSystem &MovementSystem::getInstance()
 {
@@ -13,7 +14,6 @@ MovementSystem::MovementSystem() {}
 
 void MovementSystem::update(float deltaTime, std::uint32_t playerEntityId)
 {
-  std::printf("MovementSystem::update playerEntityId: %u\n", playerEntityId);
   EntityManager &entityManager = EntityManager::getInstance();
   InputHandler &inputHandler = InputHandler::getInstance();
   auto velocity = entityManager.getVelocityComponent(playerEntityId);
@@ -31,7 +31,6 @@ void MovementSystem::update(float deltaTime, std::uint32_t playerEntityId)
     bool aScan = inputHandler.isKeyPressed(SDL_SCANCODE_A);
     bool dKey = inputHandler.isKeyPressed(SDLK_d);
     bool dScan = inputHandler.isKeyPressed(SDL_SCANCODE_D);
-    std::printf("MovementSystem: W=%d WS=%d S=%d SS=%d A=%d AS=%d D=%d DS=%d\n", wKey, wScan, sKey, sScan, aKey, aScan, dKey, dScan);
     if (wKey || wScan)
       velocity->velocityY = -1.0f;
     if (sKey || sScan)
@@ -40,7 +39,6 @@ void MovementSystem::update(float deltaTime, std::uint32_t playerEntityId)
       velocity->velocityX = -1.0f;
     if (dKey || dScan)
       velocity->velocityX = 1.0f;
-    std::printf("MovementSystem::update velocity: %.2f, %.2f\n", velocity->velocityX, velocity->velocityY);
     float magnitude = std::sqrt(velocity->velocityX * velocity->velocityX + velocity->velocityY * velocity->velocityY);
     if (magnitude > 0.0f)
     {
@@ -53,43 +51,18 @@ void MovementSystem::update(float deltaTime, std::uint32_t playerEntityId)
   for (std::uint32_t entityId = 1; entityId < EntityManager::MAX_ENTITY_ID; ++entityId)
   {
     ProjectileComponent *projectile = entityManager.getProjectileComponent(entityId);
-    CollisionComponent *collision = entityManager.getCollisionComponent(entityId);
     TransformComponent *transform = entityManager.getTransformComponent(entityId);
     VelocityComponent *velocity = entityManager.getVelocityComponent(entityId);
-    if (projectile && collision && transform && velocity)
+    if (projectile && transform && velocity)
     {
+      projectile->framesAlive++;
+      std::cout << "Projectile entity " << entityId << " framesAlive=" << projectile->framesAlive << " position=(" << transform->positionX << ", " << transform->positionY << ")" << std::endl;
       float intendedCenterX = transform->positionX + velocity->velocityX * deltaTime;
       float intendedCenterY = transform->positionY + velocity->velocityY * deltaTime;
-      bool hit = false;
-      for (std::uint32_t otherId = 1; otherId < EntityManager::MAX_ENTITY_ID; ++otherId)
-      {
-        if (otherId == entityId)
-          continue;
-        CollisionComponent *otherCollision = entityManager.getCollisionComponent(otherId);
-        if (!otherCollision)
-          continue;
-        if (projectile->ownerId == otherId)
-          continue;
-        bool overlap =
-            collision->getMinX(transform->positionX) + velocity->velocityX * deltaTime < otherCollision->getMaxX(transform->positionX) &&
-            collision->getMaxX(transform->positionX) + velocity->velocityX * deltaTime > otherCollision->getMinX(transform->positionX) &&
-            collision->getMinY(transform->positionY) + velocity->velocityY * deltaTime < otherCollision->getMaxY(transform->positionY) &&
-            collision->getMaxY(transform->positionY) + velocity->velocityY * deltaTime > otherCollision->getMinY(transform->positionY);
-        if (overlap)
-        {
-          hit = true;
-          break;
-        }
-      }
-      if (hit)
-      {
-        entityManager.destroyEntity(entityId);
-        continue;
-      }
       transform->positionX = intendedCenterX;
       transform->positionY = intendedCenterY;
     }
-    else if (transform && velocity && collision && !projectile)
+    else if (transform && velocity && !projectile)
     {
       float previousX = transform->positionX;
       float previousY = transform->positionY;
@@ -97,30 +70,6 @@ void MovementSystem::update(float deltaTime, std::uint32_t playerEntityId)
       float intendedCenterY = previousY + velocity->velocityY * deltaTime;
       transform->positionX = intendedCenterX;
       transform->positionY = intendedCenterY;
-      bool blocked = false;
-      for (std::uint32_t otherId = 1; otherId < EntityManager::MAX_ENTITY_ID; ++otherId)
-      {
-        if (otherId == entityId)
-          continue;
-        CollisionComponent *otherCollision = entityManager.getCollisionComponent(otherId);
-        if (!otherCollision)
-          continue;
-        bool overlap =
-            collision->getMinX(transform->positionX) < otherCollision->getMaxX(transform->positionX) &&
-            collision->getMaxX(transform->positionX) > otherCollision->getMinX(transform->positionX) &&
-            collision->getMinY(transform->positionY) < otherCollision->getMaxY(transform->positionY) &&
-            collision->getMaxY(transform->positionY) > otherCollision->getMinY(transform->positionY);
-        if (overlap)
-        {
-          blocked = true;
-          break;
-        }
-      }
-      if (blocked)
-      {
-        transform->positionX = previousX;
-        transform->positionY = previousY;
-      }
     }
     else if (transform && velocity)
     {

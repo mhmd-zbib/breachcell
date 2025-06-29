@@ -21,14 +21,14 @@ void WallRenderer::render()
     if (!sprite || sprite->textureId != 0)
       continue;
     TransformComponent *transform = entityManager.getTransformComponent(entityId);
-    CollisionComponent *collision = entityManager.getCollisionComponent(entityId);
-    if (!transform || !collision)
+    if (!transform)
       continue;
-    int width = static_cast<int>(collision->boxWidth);
-    int height = static_cast<int>(collision->boxHeight);
+    // Use a default wall size since collision is removed
+    int width = 32;
+    int height = 32;
     SDL_Rect wallRect;
-    wallRect.x = static_cast<int>(transform->positionX + collision->offsetX - cameraView.x - width * 0.5f);
-    wallRect.y = static_cast<int>(transform->positionY + collision->offsetY - cameraView.y - height * 0.5f);
+    wallRect.x = static_cast<int>(transform->positionX - cameraView.x - width * 0.5f);
+    wallRect.y = static_cast<int>(transform->positionY - cameraView.y - height * 0.5f);
     wallRect.w = width;
     wallRect.h = height;
     SDL_SetRenderDrawColor(renderer, 128, 128, 128, 255);

@@ -19,21 +19,15 @@ void EntityRenderer::render()
   {
     TransformComponent *transform = entityManager.getTransformComponent(entityId);
     SpriteComponent *sprite = entityManager.getSpriteComponent(entityId);
-    CollisionComponent *collision = entityManager.getCollisionComponent(entityId);
     if (!transform || !sprite)
       continue;
     SDL_Texture *texture = TextureManager::getInstance().getTexture(sprite->textureId);
     if (!texture)
       continue;
-    float centerX = transform->positionX + (collision ? collision->offsetX : 0.0f) - cameraView.x;
-    float centerY = transform->positionY + (collision ? collision->offsetY : 0.0f) - cameraView.y;
+    float centerX = transform->positionX - cameraView.x;
+    float centerY = transform->positionY - cameraView.y;
     int width = 64;
     int height = 64;
-    if (collision)
-    {
-      width = static_cast<int>(collision->boxWidth);
-      height = static_cast<int>(collision->boxHeight);
-    }
     SDL_Rect dstRect;
     dstRect.x = static_cast<int>(centerX - width * 0.5f);
     dstRect.y = static_cast<int>(centerY - height * 0.5f);

@@ -6,7 +6,6 @@
 #include <cmath>
 #include <algorithm>
 #include "input/input_handler.h"
-#include <iostream>
 
 AimingSystem::AimingSystem() {}
 
@@ -29,17 +28,11 @@ void AimingSystem::update(std::uint32_t playerEntityId, float mouseX, float mous
   EntityManager &entityManager = EntityManager::getInstance();
   TransformComponent *playerTransform = entityManager.getTransformComponent(playerEntityId);
   VelocityComponent *playerVelocity = entityManager.getVelocityComponent(playerEntityId);
-  CollisionComponent *playerCollision = entityManager.getCollisionComponent(playerEntityId);
   AimComponent *playerAim = entityManager.getAimComponent(playerEntityId);
   if (!playerTransform || !playerAim)
     return;
   float playerCenterX = playerTransform->positionX;
   float playerCenterY = playerTransform->positionY;
-  if (playerCollision)
-  {
-    playerCenterX += playerCollision->offsetX;
-    playerCenterY += playerCollision->offsetY;
-  }
   int windowX = 0;
   int windowY = 0;
   SDL_GetWindowPosition(SDL_GetWindowFromID(1), &windowX, &windowY);

@@ -1,6 +1,5 @@
 #include "input/input_handler.h"
 #include "input/input_state.h"
-#include <iostream>
 
 InputHandler &InputHandler::getInstance()
 {
@@ -25,7 +24,6 @@ void InputHandler::handleInput(bool &running)
     {
       inputState.addKey(event.key.keysym.sym);
       inputState.addScancode(SDL_GetScancodeFromKey(event.key.keysym.sym));
-      std::cout << "InputHandler: Key down sym=" << event.key.keysym.sym << " scancode=" << event.key.keysym.scancode << std::endl;
       if (event.key.keysym.sym == SDLK_ESCAPE)
         running = false;
     }
@@ -33,7 +31,6 @@ void InputHandler::handleInput(bool &running)
     {
       inputState.removeKey(event.key.keysym.sym);
       inputState.removeScancode(SDL_GetScancodeFromKey(event.key.keysym.sym));
-      std::cout << "InputHandler: Key up sym=" << event.key.keysym.sym << " scancode=" << event.key.keysym.scancode << std::endl;
     }
     else if (event.type == SDL_MOUSEMOTION)
     {
@@ -47,7 +44,6 @@ void InputHandler::handleInput(bool &running)
 bool InputHandler::isKeyPressed(SDL_Keycode key) const
 {
   bool result = inputState.isKeyActive(key);
-  std::cout << "InputHandler::isKeyPressed key=" << key << " result=" << result << std::endl;
   return result;
 }
 

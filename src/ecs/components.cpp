@@ -1,3 +1,3 @@
 #include "ecs/components.h"
 
-// Remove implementation of CollisionComponent::createCentered from components.cpp
+// File no longer needed: CollisionComponent removed

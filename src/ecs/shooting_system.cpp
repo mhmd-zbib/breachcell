@@ -6,7 +6,8 @@
 #include <SDL2/SDL.h>
 #include <random>
 #include "factories/projectile_factory.h"
-#include <iostream> // Include iostream for logging
+#include <iostream>
+#include "core/math_utils.h"
 
 ShootingSystem &ShootingSystem::getInstance()
 {
@@ -22,7 +23,6 @@ void ShootingSystem::update(std::uint32_t shooterEntityId)
   AimComponent *aim = entityManager.getAimComponent(shooterEntityId);
   if (!aim)
     return;
-  InputHandler &inputHandler = InputHandler::getInstance();
   static bool wasPressed = false;
   static std::mt19937 gen(std::random_device{}());
   static Uint32 lastShotTime = 0;
@@ -30,46 +30,33 @@ void ShootingSystem::update(std::uint32_t shooterEntityId)
   bool isPressed = (SDL_GetMouseState(nullptr, nullptr) & SDL_BUTTON(SDL_BUTTON_LEFT));
   aim->isShooting = isPressed;
   Uint32 now = SDL_GetTicks();
-  if (isPressed && (now - lastShotTime >= fireDelay))
+  if (isPressed && !wasPressed && (now - lastShotTime >= fireDelay)) // Only fire on click, not hold
   {
     TransformComponent *playerTransform = entityManager.getTransformComponent(shooterEntityId);
-    CollisionComponent *playerCollision = entityManager.getCollisionComponent(shooterEntityId);
     if (!playerTransform)
       return;
     float aimAngle = aim->aimAngle;
-    float preShotHalfCone = aim->aimConeHalfAngle;
-    std::uniform_real_distribution<float> dist(aimAngle - preShotHalfCone, aimAngle + preShotHalfCone);
+    float coneHalf = aim->aimConeHalfAngle;
+    std::uniform_real_distribution<float> dist(aimAngle - coneHalf, aimAngle + coneHalf);
     float spreadAngle = dist(gen);
     float speed = ShootingSystem::PROJECTILE_SPEED;
-    float spawnX = playerTransform->positionX;
-    float spawnY = playerTransform->positionY;
-    float width = playerCollision ? playerCollision->boxWidth : 64.0f;
-    float height = playerCollision ? playerCollision->boxHeight : 64.0f;
-    if (playerCollision)
-    {
-      spawnX += playerCollision->offsetX;
-      spawnY += playerCollision->offsetY;
-    }
-    spawnX += 0.0f;
-    spawnY += 0.0f;
-    float centerX = playerTransform->positionX + (playerCollision ? playerCollision->offsetX : 0.0f);
-    float centerY = playerTransform->positionY + (playerCollision ? playerCollision->offsetY : 0.0f);
-    float sideOffset = (playerCollision ? 0.5f * playerCollision->boxWidth : 32.0f);
+    float centerX = playerTransform->positionX;
+    float centerY = playerTransform->positionY;
     float projectileRadius = 4.0f;
-    float sideAngle = spreadAngle + static_cast<float>(M_PI_2);
-    float sideX = centerX + std::cos(sideAngle) * sideOffset;
-    float sideY = centerY + std::sin(sideAngle) * sideOffset;
-    spawnX = sideX + std::cos(spreadAngle) * projectileRadius;
-    spawnY = sideY + std::sin(spreadAngle) * projectileRadius;
-    float velocityX = std::cos(spreadAngle) * speed;
-    float velocityY = std::sin(spreadAngle) * speed;
+    float margin = 16.0f;
+    float safeOffset = 0.5f * projectileRadius + margin;
+    float spawnX = centerX + std::cos(aim->aimAngle) * safeOffset;
+    float spawnY = centerY + std::sin(aim->aimAngle) * safeOffset;
+    float width = 8.0f;
+    float height = 8.0f;
+    float velocityX = std::cos(aim->aimAngle) * speed;
+    float velocityY = std::sin(aim->aimAngle) * speed;
     float lifetime = 1.5f;
     std::string textureId = "projectile";
     ProjectileFactory::getInstance().createProjectile(
         spawnX, spawnY, velocityX, velocityY, width, height, lifetime, textureId, shooterEntityId);
+    std::cout << "Projectile spawned: entityId=" << shooterEntityId << " spawnX=" << spawnX << " spawnY=" << spawnY << " angle=" << aim->aimAngle << std::endl;
     lastShotTime = now;
-    std::cout << "ShootingSystem: centerX=" << centerX << " centerY=" << centerY << std::endl;
-    std::cout << "ShootingSystem: calculated spawnX=" << spawnX << " spawnY=" << spawnY << " spreadAngle=" << spreadAngle << std::endl;
   }
   wasPressed = isPressed;
 }

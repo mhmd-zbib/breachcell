@@ -1,6 +1,5 @@
 #include "render/renderer.h"
 #include "core/camera_service.h"
-#include <iostream>
 
 Renderer &Renderer::getInstance()
 {
@@ -23,7 +22,6 @@ bool Renderer::init(SDL_Window *window)
   renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
   if (!renderer)
   {
-    std::cerr << "SDL_CreateRenderer Error: " << SDL_GetError() << std::endl;
     return false;
   }
   return true;
