@@ -24,6 +24,7 @@ public:
   CollisionComponent *getCollisionComponent(std::uint32_t entityId);
   HealthComponent *getHealthComponent(std::uint32_t entityId);
   AimComponent *getAimComponent(std::uint32_t entityId);
+  ShooterAimingProvider *getShooterAimingProvider(std::uint32_t entityId);
   void addTransformComponent(std::uint32_t entityId, const TransformComponent &component);
   void addVelocityComponent(std::uint32_t entityId, const VelocityComponent &component);
   void addSpriteComponent(std::uint32_t entityId, const SpriteComponent &component);

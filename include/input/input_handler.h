@@ -1,6 +1,6 @@
 #pragma once
 #include <SDL2/SDL.h>
-#include <unordered_set>
+#include "input/input_state.h"
 
 class InputHandler
 {
@@ -14,6 +14,5 @@ public:
 private:
   InputHandler();
   ~InputHandler();
-
-  std::unordered_set<SDL_Keycode> pressedKeys;
+  InputState inputState;
 };

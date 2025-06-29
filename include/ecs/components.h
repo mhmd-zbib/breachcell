@@ -81,17 +81,6 @@ struct HealthComponent
     return minValue;
   }
 };
-struct AimComponent
-{
-  float aimAngle;
-  float aimConeHalfAngle;
-  float currentConeDegrees;
-  float targetConeDegrees;
-  bool isShooting;
-  float standingStillTime;
-  float lastVelocityMagnitude;
-  float lastUpdateTime;
-};
 class CollisionComponentBuilder
 {
   float centerX;
@@ -137,4 +126,22 @@ public:
     collision.boxHeight = boxHeight;
     return collision;
   }
+};
+class ShooterAimingProvider
+{
+public:
+  virtual ~ShooterAimingProvider() = default;
+  virtual float getAimingAngle(std::uint32_t entityId) const = 0;
+};
+struct AimComponent : public ShooterAimingProvider
+{
+  float aimAngle;
+  float aimConeHalfAngle;
+  float currentConeDegrees;
+  float targetConeDegrees;
+  bool isShooting;
+  float standingStillTime;
+  float lastVelocityMagnitude;
+  float lastUpdateTime;
+  float getAimingAngle(std::uint32_t entityId) const override { return aimAngle; }
 };

@@ -34,7 +34,7 @@ std::uint32_t ProjectileFactory::createProjectile(float positionX, float positio
   velocity.velocityX = velocityX;
   velocity.velocityY = velocityY;
   entityManager.addVelocityComponent(entityId, velocity);
-  CollisionComponent collision = CollisionComponent::createCentered(positionX, positionY, width, height);
+  CollisionComponent collision = CollisionComponent::createCentered(0.0f, 0.0f, width, height);
   entityManager.addCollisionComponent(entityId, collision);
   ProjectileComponent projectile;
   projectile.lifetime = lifetime;

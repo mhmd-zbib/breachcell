@@ -76,6 +76,13 @@ AimComponent *EntityManager::getAimComponent(std::uint32_t entityId)
     return &it->second;
   return nullptr;
 }
+ShooterAimingProvider *EntityManager::getShooterAimingProvider(std::uint32_t entityId)
+{
+  AimComponent *aim = getAimComponent(entityId);
+  if (aim)
+    return aim;
+  return nullptr;
+}
 void EntityManager::addTransformComponent(std::uint32_t entityId, const TransformComponent &component)
 {
   transformComponents[entityId] = component;
