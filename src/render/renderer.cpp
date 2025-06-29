@@ -1,4 +1,5 @@
 #include "render/renderer.h"
+#include "core/camera_service.h"
 #include <iostream>
 
 Renderer &Renderer::getInstance()
@@ -42,4 +43,11 @@ void Renderer::present()
 SDL_Renderer *Renderer::getSDLRenderer() const
 {
   return renderer;
+}
+
+void Renderer::render()
+{
+  SDL_Rect cameraView = CameraService::getInstance().getViewRectangle();
+  // Use cameraView for rendering offset
+  // ...existing rendering logic...
 }

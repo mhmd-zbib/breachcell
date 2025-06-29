@@ -1,5 +1,6 @@
 #pragma once
 #include <SDL2/SDL.h>
+#include "core/camera_service.h"
 
 class Renderer
 {
@@ -10,6 +11,7 @@ public:
   SDL_Renderer *getSDLRenderer() const;
   void clear();
   void present();
+  void render();
 
 private:
   Renderer();

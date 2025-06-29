@@ -20,13 +20,15 @@ void CollisionSystem::update()
   for (std::uint32_t entityA = 1; entityA < EntityManager::MAX_ENTITY_ID; ++entityA)
   {
     CollisionComponent *collisionA = entityManager.getCollisionComponent(entityA);
-    if (!collisionA)
+    TransformComponent *transformA = entityManager.getTransformComponent(entityA);
+    if (!collisionA || !transformA)
       continue;
     ProjectileComponent *projectileA = entityManager.getProjectileComponent(entityA);
     for (std::uint32_t entityB = entityA + 1; entityB < EntityManager::MAX_ENTITY_ID; ++entityB)
     {
       CollisionComponent *collisionB = entityManager.getCollisionComponent(entityB);
-      if (!collisionB)
+      TransformComponent *transformB = entityManager.getTransformComponent(entityB);
+      if (!collisionB || !transformB)
         continue;
       ProjectileComponent *projectileB = entityManager.getProjectileComponent(entityB);
       if (projectileA && projectileA->ownerId == playerId && (entityB == playerId))
@@ -45,7 +47,11 @@ void CollisionSystem::update()
         continue;
       if ((projectileA && entityB == playerId) || (projectileB && entityA == playerId))
         continue;
-      bool overlap = collisionA->intersects(*collisionB);
+      bool overlap =
+          collisionA->getMinX(transformA->positionX) < collisionB->getMaxX(transformB->positionX) &&
+          collisionA->getMaxX(transformA->positionX) > collisionB->getMinX(transformB->positionX) &&
+          collisionA->getMinY(transformA->positionY) < collisionB->getMaxY(transformB->positionY) &&
+          collisionA->getMaxY(transformA->positionY) > collisionB->getMinY(transformB->positionY);
       if (!overlap)
         continue;
       if (projectileA)
@@ -68,33 +74,25 @@ void CollisionSystem::update()
       VelocityComponent *velocityB = entityManager.getVelocityComponent(entityB);
       if (velocityA && velocityB)
       {
-        float overlapX = (collisionA->getMaxX() < collisionB->getMaxX() ? collisionA->getMaxX() : collisionB->getMaxX()) - (collisionA->getMinX() > collisionB->getMinX() ? collisionA->getMinX() : collisionB->getMinX());
-        float overlapY = (collisionA->getMaxY() < collisionB->getMaxY() ? collisionA->getMaxY() : collisionB->getMaxY()) - (collisionA->getMinY() > collisionB->getMinY() ? collisionA->getMinY() : collisionB->getMinY());
+        float overlapX = (collisionA->getMaxX(transformA->positionX) < collisionB->getMaxX(transformB->positionX) ? collisionA->getMaxX(transformA->positionX) : collisionB->getMaxX(transformB->positionX)) - (collisionA->getMinX(transformA->positionX) > collisionB->getMinX(transformB->positionX) ? collisionA->getMinX(transformA->positionX) : collisionB->getMinX(transformB->positionX));
+        float overlapY = (collisionA->getMaxY(transformA->positionY) < collisionB->getMaxY(transformB->positionY) ? collisionA->getMaxY(transformA->positionY) : collisionB->getMaxY(transformB->positionY)) - (collisionA->getMinY(transformA->positionY) > collisionB->getMinY(transformB->positionY) ? collisionA->getMinY(transformA->positionY) : collisionB->getMinY(transformB->positionY));
         if (overlapX < overlapY)
         {
-          if (collisionA->centerX < collisionB->centerX)
-          {
-            collisionA->centerX -= overlapX * 0.5f;
-            collisionB->centerX += overlapX * 0.5f;
-          }
+          float centerAX = transformA->positionX + collisionA->offsetX;
+          float centerBX = transformB->positionX + collisionB->offsetX;
+          if (centerAX < centerBX)
+            transformA->positionX -= overlapX * 0.5f;
           else
-          {
-            collisionA->centerX += overlapX * 0.5f;
-            collisionB->centerX -= overlapX * 0.5f;
-          }
+            transformA->positionX += overlapX * 0.5f;
         }
         else
         {
-          if (collisionA->centerY < collisionB->centerY)
-          {
-            collisionA->centerY -= overlapY * 0.5f;
-            collisionB->centerY += overlapY * 0.5f;
-          }
+          float centerAY = transformA->positionY + collisionA->offsetY;
+          float centerBY = transformB->positionY + collisionB->offsetY;
+          if (centerAY < centerBY)
+            transformA->positionY -= overlapY * 0.5f;
           else
-          {
-            collisionA->centerY += overlapY * 0.5f;
-            collisionB->centerY -= overlapY * 0.5f;
-          }
+            transformA->positionY += overlapY * 0.5f;
         }
       }
     }
@@ -105,6 +103,7 @@ void CollisionSystem::renderDebug()
 {
   SDL_Renderer *renderer = CoreRenderSystem::getInstance().getRenderer();
   EntityManager &entityManager = EntityManager::getInstance();
+  SDL_Rect cameraView = CameraService::getInstance().getViewRectangle();
   for (std::uint32_t entityId = 1; entityId < EntityManager::MAX_ENTITY_ID; ++entityId)
   {
     CollisionComponent *col = entityManager.getCollisionComponent(entityId);
@@ -112,14 +111,14 @@ void CollisionSystem::renderDebug()
     if (!col || !transform)
       continue;
     SDL_Rect rect;
-    rect.x = static_cast<int>(transform->positionX - col->boxWidth * 0.5f);
-    rect.y = static_cast<int>(transform->positionY - col->boxHeight * 0.5f);
+    rect.x = static_cast<int>(col->getMinX(transform->positionX) - cameraView.x);
+    rect.y = static_cast<int>(col->getMinY(transform->positionY) - cameraView.y);
     rect.w = static_cast<int>(col->boxWidth);
     rect.h = static_cast<int>(col->boxHeight);
     SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
     SDL_RenderDrawRect(renderer, &rect);
-    int centerX = static_cast<int>(transform->positionX);
-    int centerY = static_cast<int>(transform->positionY);
+    int centerX = static_cast<int>(transform->positionX + col->offsetX - cameraView.x);
+    int centerY = static_cast<int>(transform->positionY + col->offsetY - cameraView.y);
     SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
     SDL_RenderDrawLine(renderer, centerX - 8, centerY, centerX + 8, centerY);
     SDL_RenderDrawLine(renderer, centerX, centerY - 8, centerX, centerY + 8);

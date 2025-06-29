@@ -23,11 +23,18 @@ std::uint32_t PlayerFactory::createPlayer(float positionX, float positionY, floa
   InputComponent playerInput{false, false, false, false};
   float collisionWidth = spriteWidth;
   float collisionHeight = spriteHeight;
-  CollisionComponent playerCollision = CollisionComponent::createCentered(positionX, positionY, collisionWidth, collisionHeight);
+  float collisionOffsetX = 0.0f;
+  float collisionOffsetY = 0.0f;
+  CollisionComponent playerCollision = CollisionComponent::createCentered(collisionOffsetX, collisionOffsetY, collisionWidth, collisionHeight);
   entityManager.addTransformComponent(playerEntityId, playerTransform);
   entityManager.addVelocityComponent(playerEntityId, playerVelocity);
   entityManager.addSpriteComponent(playerEntityId, playerSprite);
   entityManager.addInputComponent(playerEntityId, playerInput);
   entityManager.addCollisionComponent(playerEntityId, playerCollision);
   return playerEntityId;
+}
+
+std::uint32_t PlayerFactory::create()
+{
+  return createPlayer(400.0f, 300.0f, 0.0f, 1.0f, 1, 0);
 }

@@ -3,6 +3,13 @@
 #include <cstdint>
 #include <memory>
 #include "ecs/components.h"
+class IEntityFactory
+{
+public:
+  virtual ~IEntityFactory() = default;
+  virtual std::uint32_t create() = 0;
+};
+
 class EntityManager
 {
 public:

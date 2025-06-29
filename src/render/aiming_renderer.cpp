@@ -4,6 +4,7 @@
 #include "ecs/entity_manager.h"
 #include "ecs/components.h"
 #include "render/core_render_system.h"
+#include "core/camera_service.h"
 #include <SDL2/SDL.h>
 #include <cmath>
 AimingRenderer &AimingRenderer::getInstance()
@@ -15,20 +16,22 @@ void AimingRenderer::render()
 {
   std::uint32_t playerId = Engine::getInstance().getPlayerEntityId();
   EntityManager &entityManager = EntityManager::getInstance();
+  SDL_Rect cameraView = CameraService::getInstance().getViewRectangle();
   TransformComponent *playerTransform = entityManager.getTransformComponent(playerId);
   CollisionComponent *collision = entityManager.getCollisionComponent(playerId);
   if (!playerTransform)
     return;
+  std::printf("Player position: %.2f, %.2f\n", playerTransform->positionX, playerTransform->positionY);
   float angle = AimingSystem::getInstance().getAimAngle();
   float halfCone = AimingSystem::getInstance().getAimConeHalfAngle();
   SDL_Renderer *renderer = CoreRenderSystem::getInstance().getRenderer();
   float lineLength = 400.0f;
-  float startX = playerTransform->positionX;
-  float startY = playerTransform->positionY;
+  float startX = playerTransform->positionX - cameraView.x;
+  float startY = playerTransform->positionY - cameraView.y;
   if (collision)
   {
-    startX = collision->centerX;
-    startY = collision->centerY;
+    startX = playerTransform->positionX + collision->offsetX - cameraView.x;
+    startY = playerTransform->positionY + collision->offsetY - cameraView.y;
   }
   float leftAngle = angle - halfCone;
   float rightAngle = angle + halfCone;

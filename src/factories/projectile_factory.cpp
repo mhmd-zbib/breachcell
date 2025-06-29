@@ -43,3 +43,8 @@ std::uint32_t ProjectileFactory::createProjectile(float positionX, float positio
   entityManager.addProjectileComponent(entityId, projectile);
   return entityId;
 }
+
+std::uint32_t ProjectileFactory::create()
+{
+  return createProjectile(0.0f, 0.0f, 0.0f, 0.0f, 8.0f, 8.0f, 1.0f, "1", 0);
+}

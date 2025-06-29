@@ -49,8 +49,8 @@ void ShootingSystem::update()
     float projectileRadius = 4.0f;
     if (playerCollision)
     {
-      spawnX = playerCollision->centerX;
-      spawnY = playerCollision->centerY;
+      spawnX = playerTransform->positionX + playerCollision->offsetX;
+      spawnY = playerTransform->positionY + playerCollision->offsetY;
       float playerRadius = 0.5f * std::max(playerCollision->boxWidth, playerCollision->boxHeight);
       offsetDistance = playerRadius + projectileRadius + 1.0f;
       spawnX += std::cos(spreadAngle) * offsetDistance;

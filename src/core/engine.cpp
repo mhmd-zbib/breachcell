@@ -14,6 +14,7 @@
 #include "factories/wall_factory.h"
 #include "ecs/systems/collision_system.h"
 #include "ecs/systems/health_system.h"
+#include "core/camera_service.h"
 #include <stdexcept>
 #include <iostream>
 
@@ -61,6 +62,12 @@ void Engine::handleInput()
 
 void Engine::update()
 {
+  EntityManager &entityManager = EntityManager::getInstance();
+  TransformComponent *playerTransform = entityManager.getTransformComponent(playerEntityId);
+  if (!playerTransform)
+    throw std::runtime_error("Player transform not found");
+  CameraService::getInstance().updateCameraPosition(static_cast<int>(playerTransform->positionX), static_cast<int>(playerTransform->positionY), 800, 600);
+
   InputSystem::getInstance().update();
   AimingSystem::getInstance().update();
   ShootingSystem::getInstance().update();
@@ -102,10 +109,12 @@ void Engine::createEntities()
 
 void Engine::setPlayerEntityId(std::uint32_t id)
 {
+  std::printf("Engine::setPlayerEntityId called with id: %u\n", id);
   playerEntityId = id;
   MovementSystem::getInstance().setPlayerEntityId(id);
   AimingSystem::getInstance().setPlayerEntityId(id);
   ShootingSystem::getInstance().setPlayerEntityId(id);
+  CameraService::getInstance().setTargetEntityId(id);
 }
 
 std::uint32_t Engine::getPlayerEntityId() const

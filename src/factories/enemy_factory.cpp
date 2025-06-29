@@ -20,7 +20,9 @@ std::uint32_t EnemyFactory::createEnemy(float positionX, float positionY, float 
   SpriteComponent enemySprite{textureId, drawOrder};
   float collisionWidth = spriteWidth;
   float collisionHeight = spriteHeight;
-  CollisionComponent enemyCollision = CollisionComponent::createCentered(positionX, positionY, collisionWidth, collisionHeight);
+  float collisionOffsetX = 0.0f;
+  float collisionOffsetY = 0.0f;
+  CollisionComponent enemyCollision = CollisionComponent::createCentered(collisionOffsetX, collisionOffsetY, collisionWidth, collisionHeight);
   HealthComponent enemyHealth{maxHealth, 0.0f, maxHealth};
   entityManager.addTransformComponent(enemyEntityId, enemyTransform);
   entityManager.addVelocityComponent(enemyEntityId, enemyVelocity);
@@ -28,4 +30,8 @@ std::uint32_t EnemyFactory::createEnemy(float positionX, float positionY, float 
   entityManager.addCollisionComponent(enemyEntityId, enemyCollision);
   entityManager.addHealthComponent(enemyEntityId, enemyHealth);
   return enemyEntityId;
+}
+std::uint32_t EnemyFactory::create()
+{
+  return createEnemy(200.0f, 200.0f, 0.0f, 1.0f, 2, 1, 100.0f);
 }

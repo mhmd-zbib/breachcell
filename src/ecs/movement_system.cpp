@@ -18,6 +18,7 @@ void MovementSystem::setPlayerEntityId(std::uint32_t id)
 
 void MovementSystem::update(float deltaTime)
 {
+  std::printf("MovementSystem::update playerEntityId: %u\n", playerEntityId);
   EntityManager &entityManager = EntityManager::getInstance();
   InputHandler &inputHandler = InputHandler::getInstance();
   auto velocity = entityManager.getVelocityComponent(playerEntityId);
@@ -26,23 +27,24 @@ void MovementSystem::update(float deltaTime)
   {
     velocity->velocityX = 0.0f;
     velocity->velocityY = 0.0f;
-
     float speed = inputHandler.isKeyPressed(SDLK_LSHIFT) || inputHandler.isKeyPressed(SDLK_RSHIFT) ? SLOW_SPEED : NORMAL_SPEED;
-    if (inputHandler.isKeyPressed(SDLK_w))
+    if (inputHandler.isKeyPressed(SDLK_w) || inputHandler.isKeyPressed(SDL_SCANCODE_W))
       velocity->velocityY = -1.0f;
-    if (inputHandler.isKeyPressed(SDLK_s))
+    if (inputHandler.isKeyPressed(SDLK_s) || inputHandler.isKeyPressed(SDL_SCANCODE_S))
       velocity->velocityY = 1.0f;
-    if (inputHandler.isKeyPressed(SDLK_a))
+    if (inputHandler.isKeyPressed(SDLK_a) || inputHandler.isKeyPressed(SDL_SCANCODE_A))
       velocity->velocityX = -1.0f;
-    if (inputHandler.isKeyPressed(SDLK_d))
+    if (inputHandler.isKeyPressed(SDLK_d) || inputHandler.isKeyPressed(SDL_SCANCODE_D))
       velocity->velocityX = 1.0f;
-
+    std::printf("MovementSystem::update velocity: %.2f, %.2f\n", velocity->velocityX, velocity->velocityY);
     float magnitude = std::sqrt(velocity->velocityX * velocity->velocityX + velocity->velocityY * velocity->velocityY);
     if (magnitude > 0.0f)
     {
       velocity->velocityX = (velocity->velocityX / magnitude) * speed;
       velocity->velocityY = (velocity->velocityY / magnitude) * speed;
     }
+    transform->positionX += velocity->velocityX * deltaTime;
+    transform->positionY += velocity->velocityY * deltaTime;
   }
   for (std::uint32_t entityId = 1; entityId < EntityManager::MAX_ENTITY_ID; ++entityId)
   {
@@ -65,10 +67,10 @@ void MovementSystem::update(float deltaTime)
         if (projectile->ownerId == otherId)
           continue;
         bool overlap =
-            collision->getMinX() + velocity->velocityX * deltaTime < otherCollision->getMaxX() &&
-            collision->getMaxX() + velocity->velocityX * deltaTime > otherCollision->getMinX() &&
-            collision->getMinY() + velocity->velocityY * deltaTime < otherCollision->getMaxY() &&
-            collision->getMaxY() + velocity->velocityY * deltaTime > otherCollision->getMinY();
+            collision->getMinX(transform->positionX) + velocity->velocityX * deltaTime < otherCollision->getMaxX(transform->positionX) &&
+            collision->getMaxX(transform->positionX) + velocity->velocityX * deltaTime > otherCollision->getMinX(transform->positionX) &&
+            collision->getMinY(transform->positionY) + velocity->velocityY * deltaTime < otherCollision->getMaxY(transform->positionY) &&
+            collision->getMaxY(transform->positionY) + velocity->velocityY * deltaTime > otherCollision->getMinY(transform->positionY);
         if (overlap)
         {
           hit = true;
@@ -82,8 +84,6 @@ void MovementSystem::update(float deltaTime)
       }
       transform->positionX = intendedCenterX;
       transform->positionY = intendedCenterY;
-      collision->centerX = intendedCenterX;
-      collision->centerY = intendedCenterY;
     }
     else if (transform && velocity && collision && !projectile)
     {
@@ -91,8 +91,6 @@ void MovementSystem::update(float deltaTime)
       float previousY = transform->positionY;
       float intendedCenterX = previousX + velocity->velocityX * deltaTime;
       float intendedCenterY = previousY + velocity->velocityY * deltaTime;
-      collision->centerX = intendedCenterX;
-      collision->centerY = intendedCenterY;
       transform->positionX = intendedCenterX;
       transform->positionY = intendedCenterY;
       bool blocked = false;
@@ -104,10 +102,10 @@ void MovementSystem::update(float deltaTime)
         if (!otherCollision)
           continue;
         bool overlap =
-            collision->getMinX() < otherCollision->getMaxX() &&
-            collision->getMaxX() > otherCollision->getMinX() &&
-            collision->getMinY() < otherCollision->getMaxY() &&
-            collision->getMaxY() > otherCollision->getMinY();
+            collision->getMinX(transform->positionX) < otherCollision->getMaxX(transform->positionX) &&
+            collision->getMaxX(transform->positionX) > otherCollision->getMinX(transform->positionX) &&
+            collision->getMinY(transform->positionY) < otherCollision->getMaxY(transform->positionY) &&
+            collision->getMaxY(transform->positionY) > otherCollision->getMinY(transform->positionY);
         if (overlap)
         {
           blocked = true;
@@ -118,8 +116,6 @@ void MovementSystem::update(float deltaTime)
       {
         transform->positionX = previousX;
         transform->positionY = previousY;
-        collision->centerX = previousX;
-        collision->centerY = previousY;
       }
     }
     else if (transform && velocity)

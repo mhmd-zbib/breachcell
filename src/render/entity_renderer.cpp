@@ -3,6 +3,7 @@
 #include "ecs/components.h"
 #include "render/texture_manager.h"
 #include "render/core_render_system.h"
+#include "core/camera_service.h"
 #include <SDL2/SDL.h>
 EntityRenderer &EntityRenderer::getInstance()
 {
@@ -12,6 +13,7 @@ EntityRenderer &EntityRenderer::getInstance()
 void EntityRenderer::render()
 {
   SDL_Renderer *renderer = CoreRenderSystem::getInstance().getRenderer();
+  SDL_Rect cameraView = CameraService::getInstance().getViewRectangle();
   EntityManager &entityManager = EntityManager::getInstance();
   for (std::uint32_t entityId = 1; entityId < EntityManager::MAX_ENTITY_ID; ++entityId)
   {
@@ -23,8 +25,8 @@ void EntityRenderer::render()
     SDL_Texture *texture = TextureManager::getInstance().getTexture(sprite->textureId);
     if (!texture)
       continue;
-    float centerX = transform->positionX;
-    float centerY = transform->positionY;
+    float centerX = transform->positionX + (collision ? collision->offsetX : 0.0f) - cameraView.x;
+    float centerY = transform->positionY + (collision ? collision->offsetY : 0.0f) - cameraView.y;
     int width = 64;
     int height = 64;
     if (collision)

@@ -1,6 +1,7 @@
 #pragma once
 #include <cstdint>
 #include <SDL2/SDL.h>
+#include "core/camera_service.h"
 class Engine
 {
 public:
@@ -18,7 +19,7 @@ private:
   void createEntities();
   void setPlayerEntityId(std::uint32_t id);
   bool running;
-  std::uint32_t playerEntityId = 0;
+  std::uint32_t playerEntityId;
   class InputHandler *inputHandler;
   class Renderer *renderer;
   SDL_Window *window = nullptr;

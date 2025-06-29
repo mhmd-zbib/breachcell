@@ -24,14 +24,16 @@ void InputHandler::handleInput(bool &running)
     else if (event.type == SDL_KEYDOWN)
     {
       pressedKeys.insert(event.key.keysym.sym);
-      std::cout << "Key pressed: " << SDL_GetKeyName(event.key.keysym.sym) << std::endl;
+      pressedKeys.insert(SDL_GetScancodeFromKey(event.key.keysym.sym));
+      std::cout << "Key pressed: " << SDL_GetKeyName(event.key.keysym.sym) << " (keycode: " << event.key.keysym.sym << ", scancode: " << event.key.keysym.scancode << ")" << std::endl;
       if (event.key.keysym.sym == SDLK_ESCAPE)
         running = false;
     }
     else if (event.type == SDL_KEYUP)
     {
       pressedKeys.erase(event.key.keysym.sym);
-      std::cout << "Key released: " << SDL_GetKeyName(event.key.keysym.sym) << std::endl;
+      pressedKeys.erase(SDL_GetScancodeFromKey(event.key.keysym.sym));
+      std::cout << "Key released: " << SDL_GetKeyName(event.key.keysym.sym) << " (keycode: " << event.key.keysym.sym << ", scancode: " << event.key.keysym.scancode << ")" << std::endl;
     }
     else if (event.type == SDL_MOUSEMOTION)
     {
@@ -47,7 +49,11 @@ void InputHandler::handleInput(bool &running)
 
 bool InputHandler::isKeyPressed(SDL_Keycode key) const
 {
-  return pressedKeys.find(key) != pressedKeys.end();
+  if (pressedKeys.find(key) != pressedKeys.end())
+    return true;
+  if (pressedKeys.find(SDL_GetScancodeFromKey(key)) != pressedKeys.end())
+    return true;
+  return false;
 }
 
 void InputHandler::processInput() {}

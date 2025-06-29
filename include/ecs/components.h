@@ -33,50 +33,22 @@ struct ProjectileComponent
 };
 struct CollisionComponent
 {
-  float centerX;
-  float centerY;
+  float offsetX;
+  float offsetY;
   float boxWidth;
   float boxHeight;
-  float getMinX() const { return centerX - boxWidth * 0.5f; }
-  float getMaxX() const { return centerX + boxWidth * 0.5f; }
-  float getMinY() const { return centerY - boxHeight * 0.5f; }
-  float getMaxY() const { return centerY + boxHeight * 0.5f; }
-  void setCenter(float x, float y)
-  {
-    centerX = x;
-    centerY = y;
-  }
-  void setSize(float width, float height)
-  {
-    boxWidth = width;
-    boxHeight = height;
-  }
-  static CollisionComponent createCentered(float centerX, float centerY, float width, float height)
+  float getMinX(float ownerX) const { return ownerX + offsetX - boxWidth * 0.5f; }
+  float getMaxX(float ownerX) const { return ownerX + offsetX + boxWidth * 0.5f; }
+  float getMinY(float ownerY) const { return ownerY + offsetY - boxHeight * 0.5f; }
+  float getMaxY(float ownerY) const { return ownerY + offsetY + boxHeight * 0.5f; }
+  static CollisionComponent createCentered(float offsetX, float offsetY, float width, float height)
   {
     CollisionComponent c;
-    c.centerX = centerX;
-    c.centerY = centerY;
+    c.offsetX = offsetX;
+    c.offsetY = offsetY;
     c.boxWidth = width;
     c.boxHeight = height;
     return c;
-  }
-  bool containsPoint(float pointX, float pointY) const
-  {
-    return pointX >= getMinX() && pointX <= getMaxX() && pointY >= getMinY() && pointY <= getMaxY();
-  }
-  bool intersects(const CollisionComponent &other) const
-  {
-    return getMinX() < other.getMaxX() && getMaxX() > other.getMinX() && getMinY() < other.getMaxY() && getMaxY() > other.getMinY();
-  }
-  void moveToCenter(float newCenterX, float newCenterY)
-  {
-    centerX = newCenterX;
-    centerY = newCenterY;
-  }
-  void resizeFromCenter(float newWidth, float newHeight)
-  {
-    boxWidth = newWidth;
-    boxHeight = newHeight;
   }
 };
 struct HealthComponent
@@ -148,8 +120,8 @@ public:
     if (boxWidth <= 0.0f || boxHeight <= 0.0f)
       throw std::invalid_argument("CollisionComponentBuilder: boxWidth and boxHeight must be positive");
     CollisionComponent collision;
-    collision.centerX = centerX;
-    collision.centerY = centerY;
+    collision.offsetX = centerX;
+    collision.offsetY = centerY;
     collision.boxWidth = boxWidth;
     collision.boxHeight = boxHeight;
     return collision;
