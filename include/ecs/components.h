@@ -81,6 +81,17 @@ struct HealthComponent
     return minValue;
   }
 };
+struct AimComponent
+{
+  float aimAngle;
+  float aimConeHalfAngle;
+  float currentConeDegrees;
+  float targetConeDegrees;
+  bool isShooting;
+  float standingStillTime;
+  float lastVelocityMagnitude;
+  float lastUpdateTime;
+};
 class CollisionComponentBuilder
 {
   float centerX;

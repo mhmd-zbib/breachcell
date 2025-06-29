@@ -19,20 +19,22 @@ void AimingRenderer::render()
   SDL_Rect cameraView = CameraService::getInstance().getViewRectangle();
   TransformComponent *playerTransform = entityManager.getTransformComponent(playerId);
   CollisionComponent *collision = entityManager.getCollisionComponent(playerId);
-  if (!playerTransform)
+  AimComponent *aim = entityManager.getAimComponent(playerId);
+  if (!playerTransform || !aim)
     return;
-  std::printf("Player position: %.2f, %.2f\n", playerTransform->positionX, playerTransform->positionY);
-  float angle = AimingSystem::getInstance().getAimAngle();
-  float halfCone = AimingSystem::getInstance().getAimConeHalfAngle();
+  float angle = aim->aimAngle;
+  float halfCone = aim->aimConeHalfAngle;
   SDL_Renderer *renderer = CoreRenderSystem::getInstance().getRenderer();
   float lineLength = 400.0f;
-  float startX = playerTransform->positionX - cameraView.x;
-  float startY = playerTransform->positionY - cameraView.y;
+  float startX = playerTransform->positionX;
+  float startY = playerTransform->positionY;
   if (collision)
   {
-    startX = playerTransform->positionX + collision->offsetX - cameraView.x;
-    startY = playerTransform->positionY + collision->offsetY - cameraView.y;
+    startX += collision->offsetX;
+    startY += collision->offsetY;
   }
+  startX -= cameraView.x;
+  startY -= cameraView.y;
   float leftAngle = angle - halfCone;
   float rightAngle = angle + halfCone;
   float leftEndX = startX + std::cos(leftAngle) * lineLength;

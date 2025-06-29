@@ -1,26 +1,16 @@
 #include "ecs/systems/aiming_system.h"
 #include "ecs/entity_manager.h"
 #include "core/math_utils.h"
+#include "core/camera_service.h"
 #include <SDL2/SDL.h>
 #include <cmath>
 #include <algorithm>
 #include "input/input_handler.h"
-AimingSystem &AimingSystem::getInstance()
-{
-  static AimingSystem instance;
-  return instance;
-}
-AimingSystem::AimingSystem() {}
-void AimingSystem::setPlayerEntityId(std::uint32_t id)
-{
-  playerEntityId = id;
-}
-void AimingSystem::setShooting(bool shooting)
-{
-  isShooting = shooting;
-}
+#include <iostream>
 
-void AimingSystem::triggerPostShotConeExpansion()
+AimingSystem::AimingSystem() {}
+
+void AimingSystem::triggerPostShotConeExpansion(std::uint32_t playerEntityId)
 {
   EntityManager &entityManager = EntityManager::getInstance();
   VelocityComponent *playerVelocity = entityManager.getVelocityComponent(playerEntityId);
@@ -34,27 +24,41 @@ void AimingSystem::triggerPostShotConeExpansion()
   }
 }
 
-void AimingSystem::update(float mouseX, float mouseY)
+void AimingSystem::update(std::uint32_t playerEntityId, float mouseX, float mouseY)
 {
   EntityManager &entityManager = EntityManager::getInstance();
   TransformComponent *playerTransform = entityManager.getTransformComponent(playerEntityId);
   VelocityComponent *playerVelocity = entityManager.getVelocityComponent(playerEntityId);
-  if (!playerTransform)
+  CollisionComponent *playerCollision = entityManager.getCollisionComponent(playerEntityId);
+  AimComponent *playerAim = entityManager.getAimComponent(playerEntityId);
+  if (!playerTransform || !playerAim)
     return;
-  float playerCenterX = playerTransform->positionX + 32.0f;
-  float playerCenterY = playerTransform->positionY + 32.0f;
-  float dx = mouseX - playerCenterX;
-  float dy = mouseY - playerCenterY;
-  float newAimAngle = std::atan2(dy, dx);
-  if (std::abs(newAimAngle - aimAngle) > MathUtils::PI)
+  float playerCenterX = playerTransform->positionX;
+  float playerCenterY = playerTransform->positionY;
+  if (playerCollision)
   {
-    if (newAimAngle > aimAngle)
-      aimAngle += 2 * MathUtils::PI;
+    playerCenterX += playerCollision->offsetX;
+    playerCenterY += playerCollision->offsetY;
+  }
+  int windowX = 0;
+  int windowY = 0;
+  SDL_GetWindowPosition(SDL_GetWindowFromID(1), &windowX, &windowY);
+  SDL_Rect cameraView = CameraService::getInstance().getViewRectangle();
+  float worldMouseX = mouseX + cameraView.x;
+  float worldMouseY = mouseY + cameraView.y;
+  float deltaX = worldMouseX - playerCenterX;
+  float deltaY = worldMouseY - playerCenterY;
+  float newAimAngle = std::atan2(deltaY, deltaX);
+  if (std::abs(newAimAngle - playerAim->aimAngle) > MathUtils::PI)
+  {
+    if (newAimAngle > playerAim->aimAngle)
+      playerAim->aimAngle += 2 * MathUtils::PI;
     else
-      aimAngle -= 2 * MathUtils::PI;
+      playerAim->aimAngle -= 2 * MathUtils::PI;
   }
   float aimLerpSpeed = 20.0f;
-  aimAngle += (newAimAngle - aimAngle) * std::clamp(aimLerpSpeed * 0.016f, 0.0f, 1.0f);
+  float prevAimAngle = playerAim->aimAngle;
+  playerAim->aimAngle += (newAimAngle - playerAim->aimAngle) * std::clamp(aimLerpSpeed * 0.016f, 0.0f, 1.0f);
   float velocityMagnitude = playerVelocity ? MathUtils::vectorMagnitude(playerVelocity->velocityX, playerVelocity->velocityY) : 0.0f;
   InputHandler &inputHandler = InputHandler::getInstance();
   static Uint32 lastUpdateTicks = 0;
@@ -64,64 +68,62 @@ void AimingSystem::update(float mouseX, float mouseY)
     deltaTime = std::min((now - lastUpdateTicks) / 1000.0f, 0.033f);
   lastUpdateTicks = now;
   bool isStanding = velocityMagnitude < 1e-3f;
-  static bool wasShooting = false;
-  bool shooting = isShooting;
+  bool shooting = playerAim->isShooting;
   if (isStanding)
   {
     if (shooting)
     {
-      if (standingStillTime >= 2.0f)
+      if (playerAim->standingStillTime >= 2.0f)
       {
-        targetConeDegrees = STANDING_CONE_DEGREES;
-        standingStillTime = 0.0f;
+        playerAim->targetConeDegrees = 6.0f;
+        playerAim->standingStillTime = 0.0f;
       }
       else
       {
-        targetConeDegrees = STANDING_CONE_DEGREES;
-        standingStillTime = 0.0f;
+        playerAim->targetConeDegrees = 6.0f;
+        playerAim->standingStillTime = 0.0f;
       }
     }
     else
     {
-      standingStillTime += deltaTime;
-      if (standingStillTime >= 2.0f)
+      playerAim->standingStillTime += deltaTime;
+      if (playerAim->standingStillTime >= 2.0f)
       {
-        targetConeDegrees = STANDING_FOCUSED_CONE_DEGREES;
+        playerAim->targetConeDegrees = 2.0f;
       }
       else
       {
-        targetConeDegrees = STANDING_CONE_DEGREES;
+        playerAim->targetConeDegrees = 6.0f;
       }
     }
   }
   else
   {
-    standingStillTime = 0.0f;
+    playerAim->standingStillTime = 0.0f;
     if (inputHandler.isKeyPressed(SDLK_LSHIFT) || inputHandler.isKeyPressed(SDLK_RSHIFT))
     {
-      targetConeDegrees = SLOW_WALK_CONE_DEGREES;
+      playerAim->targetConeDegrees = 10.0f;
     }
     else
     {
-      targetConeDegrees = WALKING_CONE_DEGREES;
+      playerAim->targetConeDegrees = 18.0f;
     }
   }
-  wasShooting = shooting;
-  float transitionSpeed = coneTransitionSpeed * deltaTime;
-  float delta = targetConeDegrees - currentConeDegrees;
+  float transitionSpeed = 40.0f * deltaTime;
+  float delta = playerAim->targetConeDegrees - playerAim->currentConeDegrees;
   if (std::abs(delta) < transitionSpeed)
-    currentConeDegrees = targetConeDegrees;
+    playerAim->currentConeDegrees = playerAim->targetConeDegrees;
   else
-    currentConeDegrees += (delta > 0 ? 1 : -1) * transitionSpeed;
-  aimConeHalfAngle = 0.5f * MathUtils::toRadians(currentConeDegrees);
-  lastVelocityMagnitude = velocityMagnitude;
+    playerAim->currentConeDegrees += (delta > 0 ? 1 : -1) * transitionSpeed;
+  playerAim->aimConeHalfAngle = 0.5f * MathUtils::toRadians(playerAim->currentConeDegrees);
+  playerAim->lastVelocityMagnitude = velocityMagnitude;
 }
-void AimingSystem::update()
+void AimingSystem::update(std::uint32_t playerEntityId)
 {
   int mouseX = 0;
   int mouseY = 0;
   SDL_GetMouseState(&mouseX, &mouseY);
-  update(static_cast<float>(mouseX), static_cast<float>(mouseY));
+  update(playerEntityId, static_cast<float>(mouseX), static_cast<float>(mouseY));
 }
 float AimingSystem::getAimAngle() const
 {
@@ -131,21 +133,16 @@ float AimingSystem::getAimConeHalfAngle() const
 {
   return aimConeHalfAngle;
 }
-float AimingSystem::getShootConeHalfAngle() const
+float AimingSystem::getShootConeHalfAngle(std::uint32_t playerEntityId) const
 {
   EntityManager &entityManager = EntityManager::getInstance();
-  VelocityComponent *playerVelocity = entityManager.getVelocityComponent(playerEntityId);
-  float velocityMag = 0.0f;
-  if (playerVelocity)
-    velocityMag = MathUtils::vectorMagnitude(playerVelocity->velocityX, playerVelocity->velocityY);
-  float coneDegrees = STANDING_SHOOT_CONE_DEGREES;
-  if (velocityMag >= 1e-3f)
-  {
-    InputHandler &inputHandler = InputHandler::getInstance();
-    if (inputHandler.isKeyPressed(SDLK_LSHIFT) || inputHandler.isKeyPressed(SDLK_RSHIFT))
-      coneDegrees = SLOW_WALK_SHOOT_CONE_DEGREES;
-    else
-      coneDegrees = WALKING_SHOOT_CONE_DEGREES;
-  }
-  return 0.5f * MathUtils::toRadians(coneDegrees);
+  AimComponent *aim = entityManager.getAimComponent(playerEntityId);
+  if (!aim)
+    throw std::runtime_error("AimComponent not found for entity");
+  return aim->aimConeHalfAngle;
+}
+AimingSystem &AimingSystem::getInstance()
+{
+  static AimingSystem instance;
+  return instance;
 }

@@ -66,16 +66,19 @@ void Engine::update()
   TransformComponent *playerTransform = entityManager.getTransformComponent(playerEntityId);
   if (!playerTransform)
     throw std::runtime_error("Player transform not found");
-  CameraService::getInstance().updateCameraPosition(static_cast<int>(playerTransform->positionX), static_cast<int>(playerTransform->positionY), 800, 600);
 
-  InputSystem::getInstance().update();
-  AimingSystem::getInstance().update();
-  ShootingSystem::getInstance().update();
   Uint32 currentTicks = SDL_GetTicks();
   static Uint32 lastTicks = currentTicks;
   float deltaTime = (currentTicks - lastTicks) / 1000.0f;
   lastTicks = currentTicks;
-  MovementSystem::getInstance().update(deltaTime);
+
+  MovementSystem::getInstance().update(deltaTime, playerEntityId);
+
+  CameraService::getInstance().updateCameraPosition(static_cast<int>(playerTransform->positionX), static_cast<int>(playerTransform->positionY), 800, 600);
+
+  InputSystem::getInstance().update();
+  AimingSystem::getInstance().update(playerEntityId);
+  ShootingSystem::getInstance().update(playerEntityId);
   CollisionSystem::getInstance().update();
   HealthSystem::getInstance().update();
 }
@@ -111,9 +114,6 @@ void Engine::setPlayerEntityId(std::uint32_t id)
 {
   std::printf("Engine::setPlayerEntityId called with id: %u\n", id);
   playerEntityId = id;
-  MovementSystem::getInstance().setPlayerEntityId(id);
-  AimingSystem::getInstance().setPlayerEntityId(id);
-  ShootingSystem::getInstance().setPlayerEntityId(id);
   CameraService::getInstance().setTargetEntityId(id);
 }
 

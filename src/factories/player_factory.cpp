@@ -26,11 +26,21 @@ std::uint32_t PlayerFactory::createPlayer(float positionX, float positionY, floa
   float collisionOffsetX = 0.0f;
   float collisionOffsetY = 0.0f;
   CollisionComponent playerCollision = CollisionComponent::createCentered(collisionOffsetX, collisionOffsetY, collisionWidth, collisionHeight);
+  AimComponent playerAim{};
+  playerAim.aimAngle = 0.0f;
+  playerAim.aimConeHalfAngle = 0.0f;
+  playerAim.currentConeDegrees = 6.0f;
+  playerAim.targetConeDegrees = 6.0f;
+  playerAim.isShooting = false;
+  playerAim.standingStillTime = 0.0f;
+  playerAim.lastVelocityMagnitude = 0.0f;
+  playerAim.lastUpdateTime = 0.0f;
   entityManager.addTransformComponent(playerEntityId, playerTransform);
   entityManager.addVelocityComponent(playerEntityId, playerVelocity);
   entityManager.addSpriteComponent(playerEntityId, playerSprite);
   entityManager.addInputComponent(playerEntityId, playerInput);
   entityManager.addCollisionComponent(playerEntityId, playerCollision);
+  entityManager.addComponent(playerEntityId, playerAim);
   return playerEntityId;
 }
 

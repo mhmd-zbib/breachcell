@@ -16,12 +16,7 @@ ShootingSystem &ShootingSystem::getInstance()
 
 ShootingSystem::ShootingSystem() {}
 
-void ShootingSystem::setPlayerEntityId(std::uint32_t id)
-{
-  playerEntityId = id;
-}
-
-void ShootingSystem::update()
+void ShootingSystem::update(std::uint32_t playerEntityId)
 {
   InputHandler &inputHandler = InputHandler::getInstance();
   static bool wasPressed = false;
@@ -29,17 +24,19 @@ void ShootingSystem::update()
   static Uint32 lastShotTime = 0;
   static constexpr Uint32 fireDelay = 100;
   bool isPressed = (SDL_GetMouseState(nullptr, nullptr) & SDL_BUTTON(SDL_BUTTON_LEFT));
-  AimingSystem::getInstance().setShooting(isPressed);
+  EntityManager &entityManager = EntityManager::getInstance();
+  AimComponent *aim = entityManager.getAimComponent(playerEntityId);
+  if (aim)
+    aim->isShooting = isPressed;
   Uint32 now = SDL_GetTicks();
   if (isPressed && (now - lastShotTime >= fireDelay))
   {
-    EntityManager &entityManager = EntityManager::getInstance();
     TransformComponent *playerTransform = entityManager.getTransformComponent(playerEntityId);
     CollisionComponent *playerCollision = entityManager.getCollisionComponent(playerEntityId);
-    if (!playerTransform)
+    if (!playerTransform || !aim)
       return;
-    float aimAngle = AimingSystem::getInstance().getAimAngle();
-    float preShotHalfCone = AimingSystem::getInstance().getAimConeHalfAngle();
+    float aimAngle = aim->aimAngle;
+    float preShotHalfCone = aim->aimConeHalfAngle;
     std::uniform_real_distribution<float> dist(aimAngle - preShotHalfCone, aimAngle + preShotHalfCone);
     float spreadAngle = dist(gen);
     float speed = ShootingSystem::PROJECTILE_SPEED;
@@ -49,8 +46,8 @@ void ShootingSystem::update()
     float projectileRadius = 4.0f;
     if (playerCollision)
     {
-      spawnX = playerTransform->positionX + playerCollision->offsetX;
-      spawnY = playerTransform->positionY + playerCollision->offsetY;
+      spawnX += playerCollision->offsetX;
+      spawnY += playerCollision->offsetY;
       float playerRadius = 0.5f * std::max(playerCollision->boxWidth, playerCollision->boxHeight);
       offsetDistance = playerRadius + projectileRadius + 1.0f;
       spawnX += std::cos(spreadAngle) * offsetDistance;
@@ -65,7 +62,6 @@ void ShootingSystem::update()
     ProjectileFactory::getInstance().createProjectile(
         spawnX, spawnY, velocityX, velocityY, width, height, lifetime, textureId, playerEntityId);
     lastShotTime = now;
-    AimingSystem::getInstance().triggerPostShotConeExpansion();
   }
   wasPressed = isPressed;
 }

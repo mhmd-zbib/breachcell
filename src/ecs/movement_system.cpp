@@ -11,12 +11,7 @@ MovementSystem &MovementSystem::getInstance()
 
 MovementSystem::MovementSystem() {}
 
-void MovementSystem::setPlayerEntityId(std::uint32_t id)
-{
-  playerEntityId = id;
-}
-
-void MovementSystem::update(float deltaTime)
+void MovementSystem::update(float deltaTime, std::uint32_t playerEntityId)
 {
   std::printf("MovementSystem::update playerEntityId: %u\n", playerEntityId);
   EntityManager &entityManager = EntityManager::getInstance();
@@ -28,20 +23,29 @@ void MovementSystem::update(float deltaTime)
     velocity->velocityX = 0.0f;
     velocity->velocityY = 0.0f;
     float speed = inputHandler.isKeyPressed(SDLK_LSHIFT) || inputHandler.isKeyPressed(SDLK_RSHIFT) ? SLOW_SPEED : NORMAL_SPEED;
-    if (inputHandler.isKeyPressed(SDLK_w) || inputHandler.isKeyPressed(SDL_SCANCODE_W))
+    bool wKey = inputHandler.isKeyPressed(SDLK_w);
+    bool wScan = inputHandler.isKeyPressed(SDL_SCANCODE_W);
+    bool sKey = inputHandler.isKeyPressed(SDLK_s);
+    bool sScan = inputHandler.isKeyPressed(SDL_SCANCODE_S);
+    bool aKey = inputHandler.isKeyPressed(SDLK_a);
+    bool aScan = inputHandler.isKeyPressed(SDL_SCANCODE_A);
+    bool dKey = inputHandler.isKeyPressed(SDLK_d);
+    bool dScan = inputHandler.isKeyPressed(SDL_SCANCODE_D);
+    std::printf("MovementSystem: W=%d WS=%d S=%d SS=%d A=%d AS=%d D=%d DS=%d\n", wKey, wScan, sKey, sScan, aKey, aScan, dKey, dScan);
+    if (wKey || wScan)
       velocity->velocityY = -1.0f;
-    if (inputHandler.isKeyPressed(SDLK_s) || inputHandler.isKeyPressed(SDL_SCANCODE_S))
+    if (sKey || sScan)
       velocity->velocityY = 1.0f;
-    if (inputHandler.isKeyPressed(SDLK_a) || inputHandler.isKeyPressed(SDL_SCANCODE_A))
+    if (aKey || aScan)
       velocity->velocityX = -1.0f;
-    if (inputHandler.isKeyPressed(SDLK_d) || inputHandler.isKeyPressed(SDL_SCANCODE_D))
+    if (dKey || dScan)
       velocity->velocityX = 1.0f;
     std::printf("MovementSystem::update velocity: %.2f, %.2f\n", velocity->velocityX, velocity->velocityY);
     float magnitude = std::sqrt(velocity->velocityX * velocity->velocityX + velocity->velocityY * velocity->velocityY);
     if (magnitude > 0.0f)
     {
-      velocity->velocityX = (velocity->velocityX / magnitude) * speed;
-      velocity->velocityY = (velocity->velocityY / magnitude) * speed;
+      velocity->velocityX = (velocity->velocityX / magnitude) * NORMAL_SPEED;
+      velocity->velocityY = (velocity->velocityY / magnitude) * NORMAL_SPEED;
     }
     transform->positionX += velocity->velocityX * deltaTime;
     transform->positionY += velocity->velocityY * deltaTime;
@@ -124,13 +128,4 @@ void MovementSystem::update(float deltaTime)
       transform->positionY += velocity->velocityY * deltaTime;
     }
   }
-}
-
-void MovementSystem::update()
-{
-  static Uint32 lastTicks = SDL_GetTicks();
-  Uint32 currentTicks = SDL_GetTicks();
-  float deltaTime = (currentTicks - lastTicks) / 1000.0f;
-  lastTicks = currentTicks;
-  update(deltaTime);
 }

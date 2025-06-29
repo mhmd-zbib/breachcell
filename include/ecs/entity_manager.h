@@ -23,6 +23,7 @@ public:
   ProjectileComponent *getProjectileComponent(std::uint32_t entityId);
   CollisionComponent *getCollisionComponent(std::uint32_t entityId);
   HealthComponent *getHealthComponent(std::uint32_t entityId);
+  AimComponent *getAimComponent(std::uint32_t entityId);
   void addTransformComponent(std::uint32_t entityId, const TransformComponent &component);
   void addVelocityComponent(std::uint32_t entityId, const VelocityComponent &component);
   void addSpriteComponent(std::uint32_t entityId, const SpriteComponent &component);
@@ -30,6 +31,7 @@ public:
   void addProjectileComponent(std::uint32_t entityId, const ProjectileComponent &component);
   void addCollisionComponent(std::uint32_t entityId, const CollisionComponent &component);
   void addHealthComponent(std::uint32_t entityId, const HealthComponent &component);
+  void addComponent(std::uint32_t entityId, const AimComponent &component);
   static constexpr std::uint32_t MAX_ENTITY_ID = 1024;
 
 private:
@@ -42,4 +44,5 @@ private:
   std::unordered_map<std::uint32_t, ProjectileComponent> projectileComponents;
   std::unordered_map<std::uint32_t, CollisionComponent> collisionComponents;
   std::unordered_map<std::uint32_t, HealthComponent> healthComponents;
+  std::unordered_map<std::uint32_t, AimComponent> aimComponents;
 };
