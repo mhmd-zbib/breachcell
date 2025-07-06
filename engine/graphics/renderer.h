@@ -8,6 +8,8 @@
 class Window;
 class Texture;
 class ShapeRenderer;
+class Camera;
+class CameraSystem;
 
 class Renderer
 {
@@ -24,12 +26,18 @@ class Renderer
     std::unique_ptr<Texture> loadTexture(const std::string& filePath);
     ShapeRenderer* getShapeRenderer();
     SDL_Renderer* getSDLRenderer();
+    void setCamera(Camera* cameraPtr);
+    Camera* getCamera();
+    void setCameraSystem(std::shared_ptr<CameraSystem> cameraSystemPtr);
+    std::shared_ptr<CameraSystem> getCameraSystem();
 
   private:
     Window* window;
     SDL_Renderer* renderer;
     std::unique_ptr<ShapeRenderer> shapeRenderer;
     bool initialized;
+    Camera* camera;
+    std::shared_ptr<CameraSystem> cameraSystem;
 };
 
 #endif

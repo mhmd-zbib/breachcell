@@ -1,6 +1,10 @@
 #include "engine.h"
 #include "../game/game.h"
 #include "core/igame.h"
+#include "graphics/camera.h"
+#include "graphics/camera_clamp_strategies.h"
+#include "graphics/camera_smoothing_strategies.h"
+#include "graphics/camera_tracking_strategies.h"
 #include "graphics/renderer.h"
 #include "graphics/window.h"
 #include "input/input_system.h"
@@ -25,6 +29,7 @@ void Engine::initialize()
     timer = std::make_unique<Timer>();
     movementSystem = std::make_shared<MovementSystem>();
     velocitySystem = std::make_shared<VelocitySystem>();
+    cameraSystem = std::make_shared<CameraSystem>();
     isRunning = true;
     if (game)
     {
@@ -36,9 +41,13 @@ void Engine::initialize()
         {
             concreteGame->setMovementSystem(movementSystem);
             concreteGame->setVelocitySystem(velocitySystem);
+            concreteGame->setCameraSystem(cameraSystem);
         }
         game->initialize();
     }
+    renderer->setCameraSystem(cameraSystem);
+    if (cameraSystem)
+        cameraSystem->setViewportSize(static_cast<float>(windowConfig.width), static_cast<float>(windowConfig.height));
 }
 
 void Engine::run()
@@ -65,6 +74,9 @@ void Engine::processInput()
 void Engine::processUpdate()
 {
     float deltaTime = timer->getDeltaTime();
+    Game* concreteGame = dynamic_cast<Game*>(game);
+    if (cameraSystem && concreteGame)
+        cameraSystem->update(concreteGame->getEntityManager(), deltaTime);
     game->update(deltaTime);
 }
 

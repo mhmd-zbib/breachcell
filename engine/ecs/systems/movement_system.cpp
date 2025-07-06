@@ -10,13 +10,14 @@ void MovementSystem::processInput(InputSystem* inputSystem, int entityId, Veloci
         throw std::invalid_argument("Null inputSystem or velocityComponent");
     float velocityX = 0.0f;
     float velocityY = 0.0f;
-    if (inputSystem->isKeyPressed(SDL_SCANCODE_W))
+    auto& keyboard = inputSystem->getKeyboard();
+    if (keyboard.isKeyDown(SDL_SCANCODE_W))
         velocityY -= 1.0f;
-    if (inputSystem->isKeyPressed(SDL_SCANCODE_S))
+    if (keyboard.isKeyDown(SDL_SCANCODE_S))
         velocityY += 1.0f;
-    if (inputSystem->isKeyPressed(SDL_SCANCODE_A))
+    if (keyboard.isKeyDown(SDL_SCANCODE_A))
         velocityX -= 1.0f;
-    if (inputSystem->isKeyPressed(SDL_SCANCODE_D))
+    if (keyboard.isKeyDown(SDL_SCANCODE_D))
         velocityX += 1.0f;
     float length = std::sqrt(velocityX * velocityX + velocityY * velocityY);
     if (length > 0.0f)

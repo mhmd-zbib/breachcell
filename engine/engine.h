@@ -4,6 +4,7 @@
 #include "../engine/ecs/systems/movement_system.h"
 #include "../engine/ecs/systems/velocity_system.h"
 #include "core/igame.h"
+#include "ecs/systems/camera_system.h"
 #include "graphics/renderer.h"
 #include "graphics/window.h"
 #include "input/input_system.h"
@@ -32,6 +33,7 @@ class Engine
     std::unique_ptr<Timer> timer;
     std::shared_ptr<MovementSystem> movementSystem;
     std::shared_ptr<VelocitySystem> velocitySystem;
+    std::shared_ptr<CameraSystem> cameraSystem;
 };
 
 #endif

@@ -1,11 +1,15 @@
 #include "renderer.h"
+#include "camera.h"
 #include "shape_renderer.h"
 #include "texture.h"
 #include "window.h"
 #include <SDL2/SDL_image.h>
 #include <stdexcept>
 
-Renderer::Renderer(Window* windowInstance) : window(windowInstance), renderer(nullptr), initialized(false) {}
+Renderer::Renderer(Window* windowInstance)
+    : window(windowInstance), renderer(nullptr), initialized(false), camera(nullptr)
+{
+}
 
 Renderer::~Renderer()
 {
@@ -72,4 +76,23 @@ ShapeRenderer* Renderer::getShapeRenderer()
 SDL_Renderer* Renderer::getSDLRenderer()
 {
     return renderer;
+}
+
+void Renderer::setCamera(Camera* cameraPtr)
+{
+    camera = cameraPtr;
+}
+
+Camera* Renderer::getCamera()
+{
+    return camera;
+}
+
+void Renderer::setCameraSystem(std::shared_ptr<CameraSystem> cameraSystemPtr)
+{
+    cameraSystem = cameraSystemPtr;
+}
+std::shared_ptr<CameraSystem> Renderer::getCameraSystem()
+{
+    return cameraSystem;
 }

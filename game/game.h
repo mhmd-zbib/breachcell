@@ -2,6 +2,7 @@
 #define GAME_H
 
 #include "../engine/core/igame.h"
+#include "../engine/ecs/systems/camera_system.h"
 #include "../engine/ecs/systems/movement_system.h"
 #include "../engine/ecs/systems/velocity_system.h"
 #include "../engine/graphics/circle_shape.h"
@@ -31,6 +32,8 @@ class Game : public IGame, public IInputInjectable
     void setInputSystem(InputSystem* inputSystemPtr) override;
     void setMovementSystem(std::shared_ptr<MovementSystem> movementSystemPtr);
     void setVelocitySystem(std::shared_ptr<VelocitySystem> velocitySystemPtr);
+    void setCameraSystem(std::shared_ptr<CameraSystem> cameraSystemPtr);
+    EntityManager& getEntityManager();
 
   private:
     int playerEntityId;
@@ -38,6 +41,7 @@ class Game : public IGame, public IInputInjectable
     InputSystem* inputSystem;
     std::shared_ptr<MovementSystem> movementSystem;
     std::shared_ptr<VelocitySystem> velocitySystem;
+    std::shared_ptr<CameraSystem> cameraSystem;
 };
 
 #endif
