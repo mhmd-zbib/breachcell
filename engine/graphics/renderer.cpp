@@ -1,5 +1,4 @@
 #include "renderer.h"
-#include "camera.h"
 #include "shape_renderer.h"
 #include "texture.h"
 #include "window.h"
