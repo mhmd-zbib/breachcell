@@ -1,75 +1,26 @@
 #include "game.h"
-#include "../engine/ecs/components/speed_component.h"
-#include "../engine/ecs/systems/camera_system.h"
-#include "../engine/ecs/systems/movement_system.h"
-#include "../engine/ecs/systems/velocity_system.h"
-#include "../engine/graphics/rectangle_shape.h"
-#include "../engine/input/input_system.h"
+#include "entities/BoxFactory.h"
 #include "entities/PlayerFactory.h"
 
-Game::Game() : playerEntityId(1), inputSystem(nullptr) {}
-
-void Game::setInputSystem(InputSystem* inputSystemPtr)
-{
-    inputSystem = inputSystemPtr;
-}
-
-void Game::setMovementSystem(std::shared_ptr<MovementSystem> movementSystemPtr)
-{
-    movementSystem = movementSystemPtr;
-}
-
-void Game::setVelocitySystem(std::shared_ptr<VelocitySystem> velocitySystemPtr)
-{
-    velocitySystem = velocitySystemPtr;
-}
-
-void Game::setCameraSystem(std::shared_ptr<CameraSystem> cameraSystemPtr)
-{
-    cameraSystem = cameraSystemPtr;
-}
+Game::Game() : playerEntityId(1) {}
 
 void Game::initialize()
 {
-    playerEntityId = PlayerFactory::createPlayerEntity(entityManager, 400.0f, 300.0f, 200.0f, cameraSystem.get());
+    playerEntityId = PlayerFactory::createPlayerEntity(entityManager, 400.0f, 300.0f, 200.0f);
+    BoxFactory::createBoxEntity(entityManager, 100.0f, 100.0f, 60.0f, 60.0f, 255, 0, 0, 255);
+    BoxFactory::createBoxEntity(entityManager, -200.0f, -100.0f, 60.0f, 60.0f, 255, 0, 0, 255);
 }
 
-void Game::update(float deltaTime)
+int Game::getPlayerEntityId() const
 {
-    if (!inputSystem)
-        throw std::runtime_error("InputSystem not set");
-    inputSystem->nextFrame();
-    if (movementSystem)
-        movementSystem->update(inputSystem, playerEntityId, entityManager, deltaTime);
+    return playerEntityId;
 }
 
-void Game::render(Renderer* renderer)
-{
-    TransformComponent* transform = entityManager.getComponent<TransformComponent>(playerEntityId);
-    if (transform && cameraSystem)
-    {
-        CameraComponent* camera = cameraSystem->getCameraComponent();
-        float screenX = transform->getPositionX() - camera->getPositionX();
-        float screenY = transform->getPositionY() - camera->getPositionY();
-        CircleShape circle((int) screenX, (int) screenY, 40, 0, 200, 255, 255);
-        renderer->getShapeRenderer()->drawShape(&circle, ShapeStyle::Filled);
-        int boxWidth = 60;
-        int boxHeight = 60;
-        int boxWorldX = 100;
-        int boxWorldY = 100;
-        float boxScreenX = boxWorldX - camera->getPositionX();
-        float boxScreenY = boxWorldY - camera->getPositionY();
-        RectangleShape box((int) boxScreenX, (int) boxScreenY, boxWidth, boxHeight, 255, 0, 0, 255);
-        renderer->getShapeRenderer()->drawShape(&box, ShapeStyle::Filled);
-    }
-}
+void Game::update(float deltaTime) {}
 
-void Game::shutdown()
-{
-    inputSystem = nullptr;
-    movementSystem.reset();
-    velocitySystem.reset();
-}
+void Game::render(Renderer* renderer) {}
+
+void Game::shutdown() {}
 
 EntityManager& Game::getEntityManager()
 {

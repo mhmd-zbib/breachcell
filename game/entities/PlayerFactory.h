@@ -10,8 +10,7 @@
 class PlayerFactory
 {
   public:
-    static int createPlayerEntity(EntityManager& entityManager, float posX, float posY, float speed,
-                                  CameraSystem* cameraSystem);
+    static int createPlayerEntity(EntityManager& entityManager, float posX, float posY, float speed);
     static void addRequiredTag(EntityManager& entityManager, int entityId, const std::string& tagValue);
 };
 

@@ -1,15 +1,17 @@
 #include "engine.h"
 #include "../game/game.h"
 #include "core/igame.h"
-#include "graphics/camera.h"
-#include "graphics/camera_clamp_strategies.h"
-#include "graphics/camera_smoothing_strategies.h"
-#include "graphics/camera_tracking_strategies.h"
+#include "ecs/entity_manager.h"
+#include "ecs/systems/camera_system.h"
+#include "ecs/systems/movement_system.h"
+#include "ecs/systems/render_system.h"
+#include "ecs/systems/velocity_system.h"
 #include "graphics/renderer.h"
 #include "graphics/window.h"
 #include "input/input_system.h"
 #include "utils/timer.h"
 #include <cassert>
+#include <memory>
 #include <stdexcept>
 
 Engine::Engine(IGame* gameInstance, const WindowConfig& config)
@@ -30,24 +32,18 @@ void Engine::initialize()
     movementSystem = std::make_shared<MovementSystem>();
     velocitySystem = std::make_shared<VelocitySystem>();
     cameraSystem = std::make_shared<CameraSystem>();
-    isRunning = true;
-    if (game)
-    {
-        IInputInjectable* injectable = dynamic_cast<IInputInjectable*>(game);
-        if (injectable)
-            injectable->setInputSystem(inputSystem.get());
-        Game* concreteGame = dynamic_cast<Game*>(game);
-        if (concreteGame)
-        {
-            concreteGame->setMovementSystem(movementSystem);
-            concreteGame->setVelocitySystem(velocitySystem);
-            concreteGame->setCameraSystem(cameraSystem);
-        }
-        game->initialize();
-    }
+    renderSystem = std::make_shared<RenderSystem>();
+    renderSystem->setCameraSystem(cameraSystem);
     renderer->setCameraSystem(cameraSystem);
     if (cameraSystem)
         cameraSystem->setViewportSize(static_cast<float>(windowConfig.width), static_cast<float>(windowConfig.height));
+    isRunning = true;
+    if (game)
+    {
+        game->initialize();
+        int playerId = game->getPlayerEntityId();
+        cameraSystem->setTargetEntity(playerId);
+    }
 }
 
 void Engine::run()
@@ -74,9 +70,18 @@ void Engine::processInput()
 void Engine::processUpdate()
 {
     float deltaTime = timer->getDeltaTime();
-    Game* concreteGame = dynamic_cast<Game*>(game);
-    if (cameraSystem && concreteGame)
-        cameraSystem->update(concreteGame->getEntityManager(), deltaTime);
+    EntityManager* entityManager = nullptr;
+    int playerEntityId = 0;
+    if (game)
+    {
+        entityManager = &(game->getEntityManager());
+        playerEntityId = game->getPlayerEntityId();
+    }
+    inputSystem->nextFrame();
+    if (movementSystem && entityManager)
+        movementSystem->update(inputSystem.get(), playerEntityId, *entityManager, deltaTime);
+    if (cameraSystem && entityManager)
+        cameraSystem->update(*entityManager, deltaTime);
     game->update(deltaTime);
 }
 
@@ -90,8 +95,11 @@ void Engine::render()
     if (renderer && renderer->isInitialized())
     {
         renderer->clear();
+        EntityManager* entityManager = nullptr;
         if (game)
-            game->render(renderer.get());
+            entityManager = &(game->getEntityManager());
+        if (renderSystem && entityManager)
+            renderSystem->render(*entityManager, renderer.get());
         renderer->present();
     }
 }
@@ -101,8 +109,12 @@ void Engine::shutdown()
     isRunning = false;
     if (game)
         game->shutdown();
-    if (renderer)
-        renderer->shutdown();
-    if (window)
-        window->shutdown();
+    renderer.reset();
+    window.reset();
+    inputSystem.reset();
+    timer.reset();
+    movementSystem.reset();
+    velocitySystem.reset();
+    cameraSystem.reset();
+    renderSystem.reset();
 }

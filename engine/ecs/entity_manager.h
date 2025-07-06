@@ -6,10 +6,12 @@
 #include <typeindex>
 #include <unordered_map>
 #include <unordered_set>
+#include <vector>
 
 enum class EntityTag
 {
-    Player
+    Player,
+    Box
 };
 
 class EntityManager
@@ -45,6 +47,7 @@ class EntityManager
     }
     EntityTag getTag(int entityId) const;
     int getEntityByTag(EntityTag tag) const;
+    std::vector<int> getAllEntities() const { return std::vector<int>(activeEntities.begin(), activeEntities.end()); }
 
   private:
     int nextEntityId;
