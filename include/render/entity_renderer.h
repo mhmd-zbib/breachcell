@@ -1,17 +1,28 @@
 #pragma once
-#include <stdexcept>
 #include <SDL2/SDL.h>
 
-class EntityRenderer
-{
+class IEntityRenderer {
 public:
-  static EntityRenderer& getInstance();
-  void render();
+  virtual ~IEntityRenderer() = default;
+  virtual void render()      = 0;
+};
+
+class CoreRenderSystem;
+class CameraService;
+class EntityManager;
+class TextureManager;
+
+class EntityRenderer : public IEntityRenderer {
+public:
+  EntityRenderer(CoreRenderSystem* coreRenderSystem, CameraService* cameraService,
+                 EntityManager* entityManager, TextureManager* textureManager);
+  void render() override;
   void renderCross(SDL_Renderer* rendererPointer, float centerX, float centerY, float crossSize,
                    SDL_Color crossColor);
 
 private:
-  EntityRenderer() = default;
-  EntityRenderer(const EntityRenderer&) = delete;
-  EntityRenderer& operator=(const EntityRenderer&) = delete;
+  CoreRenderSystem* coreRenderSystem;
+  CameraService*    cameraService;
+  EntityManager*    entityManager;
+  TextureManager*   textureManager;
 };

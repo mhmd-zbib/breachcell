@@ -3,11 +3,8 @@
 #include "factories/player_factory.h"
 #include "factories/wall_factory.h"
 
-EntityManager& EntityManager::getInstance() {
-  static EntityManager instance;
-  return instance;
+EntityManager::EntityManager() : nextEntityId(1) {
 }
-EntityManager::EntityManager() : nextEntityId(1) {}
 std::uint32_t EntityManager::createEntity() {
   return nextEntityId++;
 }
@@ -116,10 +113,22 @@ void EntityManager::addHealthComponent(std::uint32_t entityId, const HealthCompo
 void EntityManager::addComponent(std::uint32_t entityId, const AimComponent& component) {
   aimComponents[entityId] = component;
 }
+void EntityManager::setPlayerFactory(PlayerFactory* factory) {
+  playerFactory = factory;
+}
+void EntityManager::setEnemyFactory(EnemyFactory* factory) {
+  enemyFactory = factory;
+}
+void EntityManager::setWallFactory(WallFactory* factory) {
+  wallFactory = factory;
+}
 std::uint32_t EntityManager::createEntities() {
-  std::uint32_t playerEntityId =
-      PlayerFactory::getInstance().createPlayer(400.0f, 300.0f, 0.0f, 1.0f, 1, 0);
-  EnemyFactory::getInstance().createEnemy(200.0f, 200.0f, 0.0f, 1.0f, 2, 1);
-  WallFactory::getInstance().createWall(100.0f, 100.0f, 32.0f, 32.0f, 2);
+  std::uint32_t playerEntityId = 0;
+  if (playerFactory)
+    playerEntityId = playerFactory->createPlayer(400.0f, 300.0f, 0.0f, 1.0f, 1, 0);
+  if (enemyFactory)
+    enemyFactory->createEnemy(200.0f, 200.0f, 0.0f, 1.0f, 2, 1, 100.0f);
+  if (wallFactory)
+    wallFactory->createWall(100.0f, 100.0f, 32.0f, 32.0f, 2);
   return playerEntityId;
 }

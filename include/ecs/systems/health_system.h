@@ -1,13 +1,16 @@
 #pragma once
 #include <cstdint>
-class HealthSystem
-{
+class IHealthSystem {
 public:
-  static HealthSystem& getInstance();
-  void update();
+  virtual ~IHealthSystem() = default;
+  virtual void update()    = 0;
+};
+class EntityManager;
+class HealthSystem : public IHealthSystem {
+public:
+  HealthSystem(EntityManager* entityManager);
+  void update() override;
 
 private:
-  HealthSystem();
-  HealthSystem(const HealthSystem&) = delete;
-  HealthSystem& operator=(const HealthSystem&) = delete;
+  EntityManager* entityManager;
 };

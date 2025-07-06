@@ -2,17 +2,23 @@
 #include <SDL2/SDL.h>
 #include <stdexcept>
 
-Engine::Engine(InputHandler* inputHandler, Renderer* renderer, EntityManager* entityManager,
-               TextureManager* textureManager, CameraService* cameraService,
-               PlatformAbstraction* platformAbstraction, CoreRenderSystem* coreRenderSystem,
-               MovementSystem* movementSystem, InputSystem* inputSystem, AimingSystem* aimingSystem,
-               ShootingSystem* shootingSystem, HealthSystem* healthSystem)
-    : running(false), inputHandler(inputHandler), renderer(renderer), entityManager(entityManager),
-      textureManager(textureManager), cameraService(cameraService),
-      platformAbstraction(platformAbstraction), coreRenderSystem(coreRenderSystem),
-      movementSystem(movementSystem), inputSystem(inputSystem), aimingSystem(aimingSystem),
-      shootingSystem(shootingSystem), healthSystem(healthSystem), window(nullptr),
-      playerEntityId(0) {}
+Engine::Engine(EngineConfig config) :
+    running(false),
+    inputHandler(std::move(config.inputHandler)),
+    renderer(std::move(config.renderer)),
+    entityManager(std::move(config.entityManager)),
+    textureManager(std::move(config.textureManager)),
+    cameraService(std::move(config.cameraService)),
+    platformAbstraction(std::move(config.platformAbstraction)),
+    coreRenderSystem(std::move(config.coreRenderSystem)),
+    movementSystem(std::move(config.movementSystem)),
+    inputSystem(std::move(config.inputSystem)),
+    aimingSystem(std::move(config.aimingSystem)),
+    shootingSystem(std::move(config.shootingSystem)),
+    healthSystem(std::move(config.healthSystem)),
+    window(nullptr),
+    playerEntityId(0) {
+}
 
 bool Engine::initialize(const char* windowTitle, int windowWidth, int windowHeight) {
   platformAbstraction->initializeSDL();
@@ -25,15 +31,6 @@ bool Engine::initialize(const char* windowTitle, int windowWidth, int windowHeig
   setPlayerEntityId(playerEntityId);
   running = true;
   return true;
-}
-
-void Engine::run() {
-  while (running) {
-    handleInput();
-    update();
-    render();
-    SDL_Delay(16);
-  }
 }
 
 void Engine::handleInput() {
@@ -65,17 +62,17 @@ void Engine::update() {
 void Engine::render() {
   renderer->clear();
   coreRenderSystem->setRenderer(renderer->getSDLRenderer());
-  coreRenderSystem->renderAll(playerEntityId, entityManager, cameraService);
+  coreRenderSystem->renderAll(playerEntityId, entityManager.get(), cameraService.get());
   renderer->present();
 }
 
-void Engine::clean() {
+void Engine::cleanup() {
   platformAbstraction->destroyWindow();
   platformAbstraction->shutdownSDL();
-  running = false;
 }
 
-void Engine::createEntities() {}
+void Engine::createEntities() {
+}
 
 void Engine::setPlayerEntityId(std::uint32_t id) {
   playerEntityId = id;

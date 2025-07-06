@@ -1,15 +1,17 @@
 #pragma once
-#include <SDL2/SDL.h>
-class InputSystem
-{
+class IInputSystem {
 public:
-  static InputSystem& getInstance();
-  void update();
+  virtual ~IInputSystem() = default;
+  virtual void update()   = 0;
+};
+class InputHandler;
+class InputSystem : public IInputSystem {
+public:
+  InputSystem(InputHandler* handler);
+  void update() override;
   void setRunning(bool& runningFlag);
 
 private:
-  InputSystem();
-  InputSystem(const InputSystem&) = delete;
-  InputSystem& operator=(const InputSystem&) = delete;
-  bool* runningFlagPointer = nullptr;
+  bool*         runningFlagPointer = nullptr;
+  InputHandler* inputHandler;
 };

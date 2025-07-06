@@ -6,12 +6,14 @@
 #include "render/core_render_system.h"
 #include <SDL2/SDL.h>
 #include <cmath>
-AimingRenderer& AimingRenderer::getInstance() {
-  static AimingRenderer instance;
-  return instance;
+AimingRenderer::AimingRenderer(EntityManager*    entityManagerPointer,
+                               CameraService*    cameraServicePointer,
+                               CoreRenderSystem* coreRenderSystemPointer) :
+    entityManager(entityManagerPointer),
+    cameraService(cameraServicePointer),
+    coreRenderSystem(coreRenderSystemPointer) {
 }
-void AimingRenderer::render(std::uint32_t playerEntityId, EntityManager* entityManager,
-                            CameraService* cameraService, CoreRenderSystem* coreRenderSystem) {
+void AimingRenderer::render(std::uint32_t playerEntityId) {
   SDL_Rect            cameraView      = cameraService->getViewRectangle();
   TransformComponent* playerTransform = entityManager->getTransformComponent(playerEntityId);
   AimComponent*       aim             = entityManager->getAimComponent(playerEntityId);

@@ -2,7 +2,7 @@ BasedOnStyle: LLVM
 IndentWidth: 2
 ColumnLimit: 100
 
-AllowShortFunctionsOnASingleLine: Inline
+AllowShortFunctionsOnASingleLine: None
 DerivePointerAlignment: false
 PointerAlignment: Left
 UseTab: Never
@@ -28,3 +28,5 @@ AllowShortIfStatementsOnASingleLine: false
 AllowShortLoopsOnASingleLine: false
 
 SpaceBeforeCpp11BracedList: false
+BreakConstructorInitializers: AfterColon
+ConstructorInitializerAllOnOneLineOrOnePerLine: true

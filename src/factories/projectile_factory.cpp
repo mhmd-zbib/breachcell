@@ -5,30 +5,21 @@
 #include <iostream>
 #include <stdexcept>
 
-ProjectileFactory& ProjectileFactory::getInstance()
-{
-  static ProjectileFactory instance;
-  return instance;
+ProjectileFactory::ProjectileFactory(EntityManager* entityManager) : entityManager(entityManager) {
 }
-
-ProjectileFactory::ProjectileFactory() {}
 
 void ProjectileFactory::validateParameters(float positionX, float positionY, float velocityX,
                                            float velocityY, float width, float height,
-                                           float lifetime, const std::string& textureId)
-{
-  if (width <= 0.0f || height <= 0.0f)
-  {
+                                           float lifetime, const std::string& textureId) {
+  if (width <= 0.0f || height <= 0.0f) {
     throw std::invalid_argument("ProjectileFactory: width and height must be positive");
   }
 
-  if (lifetime <= 0.0f)
-  {
+  if (lifetime <= 0.0f) {
     throw std::invalid_argument("ProjectileFactory: lifetime must be positive");
   }
 
-  if (textureId.empty())
-  {
+  if (textureId.empty()) {
     throw std::invalid_argument("ProjectileFactory: textureId must not be empty");
   }
 }
@@ -36,9 +27,8 @@ void ProjectileFactory::validateParameters(float positionX, float positionY, flo
 std::uint32_t ProjectileFactory::createProjectile(float positionX, float positionY, float velocityX,
                                                   float velocityY, float width, float height,
                                                   float lifetime, const std::string& textureId,
-                                                  std::uint32_t ownerId)
-{
-  return ProjectileBuilder()
+                                                  std::uint32_t ownerId) {
+  return ProjectileBuilder(entityManager)
       .setPosition(positionX, positionY)
       .setVelocity(velocityX, velocityY)
       .setSize(width, height)
@@ -48,7 +38,6 @@ std::uint32_t ProjectileFactory::createProjectile(float positionX, float positio
       .build();
 }
 
-std::uint32_t ProjectileFactory::create()
-{
+std::uint32_t ProjectileFactory::create() {
   return createProjectile(0.0f, 0.0f, 0.0f, 0.0f, 8.0f, 8.0f, 1.0f, "1", 0);
 }

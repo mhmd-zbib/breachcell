@@ -1,17 +1,16 @@
 #pragma once
 #include <cstdint>
-#include "ecs/entity_manager.h"
-
-class WallFactory : public IEntityFactory
-{
+class IEntityFactory {
 public:
-  static WallFactory& getInstance();
+  virtual ~IEntityFactory()      = default;
+  virtual std::uint32_t create() = 0;
+};
+class EntityManager;
+class WallFactory : public IEntityFactory {
+public:
+  WallFactory(EntityManager* entityManager);
   std::uint32_t create() override;
-  std::uint32_t createWall(float positionX, float positionY, float width, float height,
-                           int drawOrder);
 
 private:
-  WallFactory() = default;
-  WallFactory(const WallFactory&) = delete;
-  WallFactory& operator=(const WallFactory&) = delete;
+  EntityManager* entityManager;
 };

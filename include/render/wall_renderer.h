@@ -1,12 +1,20 @@
 #pragma once
-class WallRenderer
-{
+class IWallRenderer {
 public:
-  static WallRenderer& getInstance();
-  void render();
+  virtual ~IWallRenderer() = default;
+  virtual void render()    = 0;
+};
+class EntityManager;
+class CameraService;
+class CoreRenderSystem;
+class WallRenderer : public IWallRenderer {
+public:
+  WallRenderer(EntityManager* entityManager, CameraService* cameraService,
+               CoreRenderSystem* coreRenderSystem);
+  void render() override;
 
 private:
-  WallRenderer() = default;
-  WallRenderer(const WallRenderer&) = delete;
-  WallRenderer& operator=(const WallRenderer&) = delete;
+  EntityManager*    entityManager;
+  CameraService*    cameraService;
+  CoreRenderSystem* coreRenderSystem;
 };

@@ -1,59 +1,50 @@
 #include "render/texture_manager.h"
 #include <SDL2/SDL_image.h>
 #include <stdexcept>
-TextureManager& TextureManager::getInstance()
-{
-  static TextureManager instance;
-  return instance;
+TextureManager::TextureManager() {
+}
+TextureManager::~TextureManager() {
+  unloadAll();
 }
 void TextureManager::loadTexture(std::uint32_t textureId, const std::string& filePath,
-                                 SDL_Renderer* renderer)
-{
-  if (textures.count(textureId))
-  {
+                                 SDL_Renderer* renderer) {
+  if (textures.count(textureId)) {
     return;
   }
 
   SDL_Surface* surface = IMG_Load(filePath.c_str());
 
-  if (!surface)
-  {
+  if (!surface) {
     throw std::runtime_error("TextureManager: Failed to load " + filePath);
   }
 
   SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, surface);
   SDL_FreeSurface(surface);
 
-  if (!texture)
-  {
+  if (!texture) {
     throw std::runtime_error("TextureManager: Failed to create texture for " + filePath);
   }
 
   textures[textureId] = texture;
 }
-SDL_Texture* TextureManager::getTexture(std::uint32_t textureId) const
-{
+SDL_Texture* TextureManager::getTexture(std::uint32_t textureId) const {
   auto it = textures.find(textureId);
 
-  if (it == textures.end())
-  {
+  if (it == textures.end()) {
     return nullptr;
   }
 
   return it->second;
 }
-void TextureManager::unloadAll()
-{
+void TextureManager::unloadAll() {
   for (auto& pair : textures)
-    if (pair.second)
-    {
+    if (pair.second) {
       SDL_DestroyTexture(pair.second);
     }
 
   textures.clear();
 }
-void TextureManager::loadTextures(SDL_Renderer* rendererPointer)
-{
+void TextureManager::loadTextures(SDL_Renderer* rendererPointer) {
   loadTexture(1, "assets/player.png", rendererPointer);
   loadTexture(2, "assets/enemy.png", rendererPointer);
 }

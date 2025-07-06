@@ -1,18 +1,24 @@
 #pragma once
 #include <cstdint>
 
+class IAimingRenderer {
+public:
+  virtual ~IAimingRenderer()                        = default;
+  virtual void render(std::uint32_t playerEntityId) = 0;
+};
+
 class EntityManager;
 class CameraService;
 class CoreRenderSystem;
 
-class AimingRenderer {
+class AimingRenderer : public IAimingRenderer {
 public:
-  static AimingRenderer& getInstance();
-  void                   render(std::uint32_t playerEntityId, EntityManager* entityManager,
-                                CameraService* cameraService, CoreRenderSystem* coreRenderSystem);
+  AimingRenderer(EntityManager* entityManager, CameraService* cameraService,
+                 CoreRenderSystem* coreRenderSystem);
+  void render(std::uint32_t playerEntityId) override;
 
 private:
-  AimingRenderer()                                 = default;
-  AimingRenderer(const AimingRenderer&)            = delete;
-  AimingRenderer& operator=(const AimingRenderer&) = delete;
+  EntityManager*    entityManager;
+  CameraService*    cameraService;
+  CoreRenderSystem* coreRenderSystem;
 };

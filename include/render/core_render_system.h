@@ -1,19 +1,33 @@
 #pragma once
 #include <SDL2/SDL.h>
 #include <cstdint>
+class IEntityRenderer;
+class IProjectileRenderer;
+class IAimingRenderer;
+class IWallRenderer;
 class EntityManager;
 class CameraService;
-class CoreRenderSystem {
+class ICoreRenderSystem {
 public:
-  static CoreRenderSystem& getInstance();
-  void                     renderAll(std::uint32_t playerEntityId, EntityManager* entityManager,
-                                     CameraService* cameraService);
-  void                     setRenderer(SDL_Renderer* rendererPointer);
-  SDL_Renderer*            getRenderer() const;
+  virtual ~ICoreRenderSystem()                                     = default;
+  virtual void          setRenderer(SDL_Renderer* rendererPointer) = 0;
+  virtual SDL_Renderer* getRenderer() const                        = 0;
+  virtual void          renderAll(std::uint32_t playerEntityId, EntityManager* entityManager,
+                                  CameraService* cameraService)    = 0;
+};
+class CoreRenderSystem : public ICoreRenderSystem {
+public:
+  CoreRenderSystem(IEntityRenderer* entityRenderer, IProjectileRenderer* projectileRenderer,
+                   IAimingRenderer* aimingRenderer, IWallRenderer* wallRenderer);
+  void          setRenderer(SDL_Renderer* rendererPointer) override;
+  SDL_Renderer* getRenderer() const override;
+  void          renderAll(std::uint32_t playerEntityId, EntityManager* entityManager,
+                          CameraService* cameraService) override;
 
 private:
-  CoreRenderSystem();
-  CoreRenderSystem(const CoreRenderSystem&)            = delete;
-  CoreRenderSystem& operator=(const CoreRenderSystem&) = delete;
-  SDL_Renderer*     sdlRenderer;
+  SDL_Renderer*        sdlRenderer;
+  IEntityRenderer*     entityRenderer;
+  IProjectileRenderer* projectileRenderer;
+  IAimingRenderer*     aimingRenderer;
+  IWallRenderer*       wallRenderer;
 };

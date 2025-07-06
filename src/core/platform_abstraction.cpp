@@ -1,12 +1,8 @@
 #include "core/platform_abstraction.h"
 #include <stdexcept>
 
-PlatformAbstraction& PlatformAbstraction::getInstance() {
-  static PlatformAbstraction instance;
-  return instance;
+PlatformAbstraction::PlatformAbstraction() : window(nullptr) {
 }
-
-PlatformAbstraction::PlatformAbstraction() : window(nullptr) {}
 
 PlatformAbstraction::~PlatformAbstraction() {
   destroyWindow();

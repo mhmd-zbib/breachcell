@@ -1,12 +1,20 @@
 #pragma once
-class ProjectileRenderer
-{
+class IProjectileRenderer {
 public:
-  static ProjectileRenderer& getInstance();
-  void render();
+  virtual ~IProjectileRenderer() = default;
+  virtual void render()          = 0;
+};
+class EntityManager;
+class CameraService;
+class CoreRenderSystem;
+class ProjectileRenderer : public IProjectileRenderer {
+public:
+  ProjectileRenderer(EntityManager* entityManager, CameraService* cameraService,
+                     CoreRenderSystem* coreRenderSystem);
+  void render() override;
 
 private:
-  ProjectileRenderer() = default;
-  ProjectileRenderer(const ProjectileRenderer&) = delete;
-  ProjectileRenderer& operator=(const ProjectileRenderer&) = delete;
+  EntityManager*    entityManager;
+  CameraService*    cameraService;
+  CoreRenderSystem* coreRenderSystem;
 };

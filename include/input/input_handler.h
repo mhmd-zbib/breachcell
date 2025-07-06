@@ -1,18 +1,16 @@
 #pragma once
-#include <SDL2/SDL.h>
 #include "input/input_state.h"
+#include <SDL2/SDL.h>
 
-class InputHandler
-{
+class InputHandler {
 public:
-  static InputHandler& getInstance();
+  InputHandler();
+  ~InputHandler();
   void processInput();
   void handleInput(bool& running);
   // Query if a key is currently pressed
   bool isKeyPressed(SDL_Keycode key) const;
 
 private:
-  InputHandler();
-  ~InputHandler();
   InputState inputState;
 };

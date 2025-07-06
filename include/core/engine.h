@@ -12,38 +12,49 @@
 #include "render/renderer.h"
 #include "render/texture_manager.h"
 #include <cstdint>
+#include <memory>
+
+struct EngineConfig {
+  std::shared_ptr<InputHandler>        inputHandler;
+  std::shared_ptr<Renderer>            renderer;
+  std::shared_ptr<EntityManager>       entityManager;
+  std::shared_ptr<TextureManager>      textureManager;
+  std::shared_ptr<CameraService>       cameraService;
+  std::shared_ptr<PlatformAbstraction> platformAbstraction;
+  std::shared_ptr<ICoreRenderSystem>   coreRenderSystem;
+  std::shared_ptr<IMovementSystem>     movementSystem;
+  std::shared_ptr<IInputSystem>        inputSystem;
+  std::shared_ptr<IAimingSystem>       aimingSystem;
+  std::shared_ptr<IShootingSystem>     shootingSystem;
+  std::shared_ptr<IHealthSystem>       healthSystem;
+};
 
 class Engine {
 public:
-  Engine(InputHandler* inputHandler, Renderer* renderer, EntityManager* entityManager,
-         TextureManager* textureManager, CameraService* cameraService,
-         PlatformAbstraction* platformAbstraction, CoreRenderSystem* coreRenderSystem,
-         MovementSystem* movementSystem, InputSystem* inputSystem, AimingSystem* aimingSystem,
-         ShootingSystem* shootingSystem, HealthSystem* healthSystem);
+  explicit Engine(EngineConfig config);
   bool          initialize(const char* windowTitle, int windowWidth, int windowHeight);
-  void          run();
   void          handleInput();
   void          update();
   void          render();
-  void          clean();
+  void          cleanup();
   void          createEntities();
   void          setPlayerEntityId(std::uint32_t id);
   std::uint32_t getPlayerEntityId() const;
 
 private:
-  bool                 running;
-  InputHandler*        inputHandler;
-  Renderer*            renderer;
-  EntityManager*       entityManager;
-  TextureManager*      textureManager;
-  CameraService*       cameraService;
-  PlatformAbstraction* platformAbstraction;
-  CoreRenderSystem*    coreRenderSystem;
-  MovementSystem*      movementSystem;
-  InputSystem*         inputSystem;
-  AimingSystem*        aimingSystem;
-  ShootingSystem*      shootingSystem;
-  HealthSystem*        healthSystem;
-  SDL_Window*          window;
-  std::uint32_t        playerEntityId;
+  bool                                 running;
+  std::shared_ptr<InputHandler>        inputHandler;
+  std::shared_ptr<Renderer>            renderer;
+  std::shared_ptr<EntityManager>       entityManager;
+  std::shared_ptr<TextureManager>      textureManager;
+  std::shared_ptr<CameraService>       cameraService;
+  std::shared_ptr<PlatformAbstraction> platformAbstraction;
+  std::shared_ptr<ICoreRenderSystem>   coreRenderSystem;
+  std::shared_ptr<IMovementSystem>     movementSystem;
+  std::shared_ptr<IInputSystem>        inputSystem;
+  std::shared_ptr<IAimingSystem>       aimingSystem;
+  std::shared_ptr<IShootingSystem>     shootingSystem;
+  std::shared_ptr<IHealthSystem>       healthSystem;
+  SDL_Window*                          window;
+  std::uint32_t                        playerEntityId;
 };

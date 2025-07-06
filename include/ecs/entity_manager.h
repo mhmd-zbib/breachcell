@@ -8,10 +8,12 @@ public:
   virtual ~IEntityFactory()      = default;
   virtual std::uint32_t create() = 0;
 };
-
+class PlayerFactory;
+class EnemyFactory;
+class WallFactory;
 class EntityManager {
 public:
-  static EntityManager&  getInstance();
+  EntityManager();
   std::uint32_t          createEntity();
   void                   destroyEntity(std::uint32_t entityId);
   TransformComponent*    getTransformComponent(std::uint32_t entityId);
@@ -30,10 +32,12 @@ public:
   void addHealthComponent(std::uint32_t entityId, const HealthComponent& component);
   void addComponent(std::uint32_t entityId, const AimComponent& component);
   std::uint32_t                  createEntities();
+  void                           setPlayerFactory(PlayerFactory* factory);
+  void                           setEnemyFactory(EnemyFactory* factory);
+  void                           setWallFactory(WallFactory* factory);
   static constexpr std::uint32_t MAX_ENTITY_ID = 1024;
 
 private:
-  EntityManager();
   std::uint32_t                                          nextEntityId;
   std::unordered_map<std::uint32_t, TransformComponent>  transformComponents;
   std::unordered_map<std::uint32_t, VelocityComponent>   velocityComponents;
@@ -42,4 +46,7 @@ private:
   std::unordered_map<std::uint32_t, ProjectileComponent> projectileComponents;
   std::unordered_map<std::uint32_t, HealthComponent>     healthComponents;
   std::unordered_map<std::uint32_t, AimComponent>        aimComponents;
+  PlayerFactory*                                         playerFactory = nullptr;
+  EnemyFactory*                                          enemyFactory  = nullptr;
+  WallFactory*                                           wallFactory   = nullptr;
 };
