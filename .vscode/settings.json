@@ -1,11 +1,5 @@
 {
   "files.associations": {
-    "*.h": "cpp",
-    "*.hpp": "cpp",
-    "*.cpp": "cpp",
-    "*.cxx": "cpp",
-    "*.cc": "cpp",
-    "stdexcept": "cpp",
     "array": "cpp",
     "atomic": "cpp",
     "bit": "cpp",
@@ -14,21 +8,17 @@
     "cmath": "cpp",
     "compare": "cpp",
     "concepts": "cpp",
-    "csignal": "cpp",
     "cstdarg": "cpp",
     "cstddef": "cpp",
     "cstdint": "cpp",
     "cstdio": "cpp",
     "cstdlib": "cpp",
     "cstring": "cpp",
-    "ctime": "cpp",
     "cwchar": "cpp",
     "cwctype": "cpp",
     "deque": "cpp",
-    "set": "cpp",
     "string": "cpp",
     "unordered_map": "cpp",
-    "unordered_set": "cpp",
     "vector": "cpp",
     "exception": "cpp",
     "algorithm": "cpp",
@@ -44,7 +34,6 @@
     "type_traits": "cpp",
     "utility": "cpp",
     "initializer_list": "cpp",
-    "iomanip": "cpp",
     "iosfwd": "cpp",
     "iostream": "cpp",
     "istream": "cpp",
@@ -53,16 +42,9 @@
     "numbers": "cpp",
     "ostream": "cpp",
     "sstream": "cpp",
+    "stdexcept": "cpp",
     "streambuf": "cpp",
     "cinttypes": "cpp",
     "typeinfo": "cpp"
-  },
-  "C_Cpp.clang_format_style": "file",
-  "editor.formatOnSave": true,
-  "editor.defaultFormatter": "ms-vscode.cpptools",
-  // Optional: enable formatting on paste for consistent formatting
-  "editor.formatOnPaste": true,
-  "[cpp]": {
-    "editor.defaultFormatter": "xaver.clang-format"
   }
 }
