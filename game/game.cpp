@@ -1,21 +1,52 @@
 #include "game.h"
-#include "../engine/graphics/circle_shape.h"
-#include "../engine/graphics/rectangle_shape.h"
-#include "../engine/graphics/renderer.h"
-#include "../engine/graphics/shape_renderer.h"
+#include "../engine/ecs/components/speed_component.h"
+#include "../engine/ecs/systems/movement_system.h"
+#include "../engine/ecs/systems/velocity_system.h"
+#include "../engine/input/input_system.h"
+#include "entities/PlayerFactory.h"
 
-Game::Game() {}
+Game::Game() : playerEntityId(1), inputSystem(nullptr) {}
 
-void Game::initialize() {}
+void Game::setInputSystem(InputSystem* inputSystemPtr)
+{
+    inputSystem = inputSystemPtr;
+}
 
-void Game::update(float deltaTime) {}
+void Game::setMovementSystem(std::shared_ptr<MovementSystem> movementSystemPtr)
+{
+    movementSystem = movementSystemPtr;
+}
+
+void Game::setVelocitySystem(std::shared_ptr<VelocitySystem> velocitySystemPtr)
+{
+    velocitySystem = velocitySystemPtr;
+}
+
+void Game::initialize()
+{
+    playerEntityId = PlayerFactory::createPlayerEntity(playerEntityId, transformComponents, velocityComponents,
+                                                       speedComponents, 400.0f, 300.0f, 200.0f);
+}
+
+void Game::update(float deltaTime)
+{
+    if (!inputSystem)
+        throw std::runtime_error("InputSystem not set");
+    if (movementSystem)
+        movementSystem->update(inputSystem, playerEntityId, transformComponents, velocityComponents, speedComponents,
+                               deltaTime);
+}
 
 void Game::render(Renderer* renderer)
 {
-    RectangleShape rectangle(100, 100, 200, 100, 255, 0, 0, 255);
-    CircleShape circle(400, 300, 50, 0, 0, 255, 255);
-    renderer->getShapeRenderer()->drawShape(&rectangle, ShapeStyle::Filled);
-    renderer->getShapeRenderer()->drawShape(&circle, ShapeStyle::Outline);
+    TransformComponent& transform = transformComponents[playerEntityId];
+    CircleShape circle((int) transform.getPositionX(), (int) transform.getPositionY(), 40, 0, 200, 255, 255);
+    renderer->getShapeRenderer()->drawShape(&circle, ShapeStyle::Filled);
 }
 
-void Game::shutdown() {}
+void Game::shutdown()
+{
+    inputSystem = nullptr;
+    movementSystem.reset();
+    velocitySystem.reset();
+}

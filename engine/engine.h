@@ -1,6 +1,8 @@
 #ifndef ENGINE_H
 #define ENGINE_H
 
+#include "../engine/ecs/systems/movement_system.h"
+#include "../engine/ecs/systems/velocity_system.h"
 #include "core/igame.h"
 #include "graphics/renderer.h"
 #include "graphics/window.h"
@@ -28,6 +30,8 @@ class Engine
     std::unique_ptr<Renderer> renderer;
     std::unique_ptr<InputSystem> inputSystem;
     std::unique_ptr<Timer> timer;
+    std::shared_ptr<MovementSystem> movementSystem;
+    std::shared_ptr<VelocitySystem> velocitySystem;
 };
 
 #endif

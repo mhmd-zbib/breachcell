@@ -12,9 +12,12 @@ file(GLOB ENGINE_SRC
     "engine/graphics/*.cpp"
     "engine/input/*.cpp"
     "engine/utils/*.cpp"
+    "engine/ecs/components/*.cpp"
+    "engine/ecs/systems/*.cpp"
 )
 file(GLOB GAME_SRC
     "game/*.cpp"
+    "game/entities/*.cpp"
 )
 
 add_executable(CppProject

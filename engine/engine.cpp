@@ -1,4 +1,5 @@
 #include "engine.h"
+#include "../game/game.h"
 #include "core/igame.h"
 #include "graphics/renderer.h"
 #include "graphics/window.h"
@@ -22,9 +23,22 @@ void Engine::initialize()
         throw std::runtime_error("Renderer initialization failed");
     inputSystem = std::make_unique<InputSystem>();
     timer = std::make_unique<Timer>();
+    movementSystem = std::make_shared<MovementSystem>();
+    velocitySystem = std::make_shared<VelocitySystem>();
     isRunning = true;
     if (game)
+    {
+        IInputInjectable* injectable = dynamic_cast<IInputInjectable*>(game);
+        if (injectable)
+            injectable->setInputSystem(inputSystem.get());
+        Game* concreteGame = dynamic_cast<Game*>(game);
+        if (concreteGame)
+        {
+            concreteGame->setMovementSystem(movementSystem);
+            concreteGame->setVelocitySystem(velocitySystem);
+        }
         game->initialize();
+    }
 }
 
 void Engine::run()
