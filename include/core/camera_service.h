@@ -5,9 +5,10 @@
 class CameraService
 {
 public:
-  static CameraService &getInstance();
+  static CameraService& getInstance();
   void setTargetEntityId(int targetEntityId);
-  void updateCameraPosition(int targetPositionX, int targetPositionY, int screenWidth, int screenHeight);
+  void updateCameraPosition(int targetPositionX, int targetPositionY, int screenWidth,
+                            int screenHeight);
   SDL_Rect getViewRectangle() const;
 
 private:

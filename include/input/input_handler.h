@@ -5,9 +5,9 @@
 class InputHandler
 {
 public:
-  static InputHandler &getInstance();
+  static InputHandler& getInstance();
   void processInput();
-  void handleInput(bool &running);
+  void handleInput(bool& running);
   // Query if a key is currently pressed
   bool isKeyPressed(SDL_Keycode key) const;
 

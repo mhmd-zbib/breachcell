@@ -5,24 +5,33 @@
 #include "render/wall_renderer.h"
 #include "core/camera_service.h"
 #include <cstdint>
-WallRenderer &WallRenderer::getInstance()
+WallRenderer& WallRenderer::getInstance()
 {
   static WallRenderer instance;
   return instance;
 }
 void WallRenderer::render()
 {
-  SDL_Renderer *renderer = CoreRenderSystem::getInstance().getRenderer();
+  SDL_Renderer* renderer = CoreRenderSystem::getInstance().getRenderer();
   SDL_Rect cameraView = CameraService::getInstance().getViewRectangle();
-  EntityManager &entityManager = EntityManager::getInstance();
+  EntityManager& entityManager = EntityManager::getInstance();
+
   for (std::uint32_t entityId = 1; entityId < EntityManager::MAX_ENTITY_ID; ++entityId)
   {
-    SpriteComponent *sprite = entityManager.getSpriteComponent(entityId);
+    SpriteComponent* sprite = entityManager.getSpriteComponent(entityId);
+
     if (!sprite || sprite->textureId != 0)
+    {
       continue;
-    TransformComponent *transform = entityManager.getTransformComponent(entityId);
+    }
+
+    TransformComponent* transform = entityManager.getTransformComponent(entityId);
+
     if (!transform)
+    {
       continue;
+    }
+
     // Use a default wall size since collision is removed
     int width = 32;
     int height = 32;

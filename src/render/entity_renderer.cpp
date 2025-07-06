@@ -5,25 +5,34 @@
 #include "render/core_render_system.h"
 #include "core/camera_service.h"
 #include <SDL2/SDL.h>
-EntityRenderer &EntityRenderer::getInstance()
+EntityRenderer& EntityRenderer::getInstance()
 {
   static EntityRenderer instance;
   return instance;
 }
 void EntityRenderer::render()
 {
-  SDL_Renderer *renderer = CoreRenderSystem::getInstance().getRenderer();
+  SDL_Renderer* renderer = CoreRenderSystem::getInstance().getRenderer();
   SDL_Rect cameraView = CameraService::getInstance().getViewRectangle();
-  EntityManager &entityManager = EntityManager::getInstance();
+  EntityManager& entityManager = EntityManager::getInstance();
+
   for (std::uint32_t entityId = 1; entityId < EntityManager::MAX_ENTITY_ID; ++entityId)
   {
-    TransformComponent *transform = entityManager.getTransformComponent(entityId);
-    SpriteComponent *sprite = entityManager.getSpriteComponent(entityId);
+    TransformComponent* transform = entityManager.getTransformComponent(entityId);
+    SpriteComponent* sprite = entityManager.getSpriteComponent(entityId);
+
     if (!transform || !sprite)
+    {
       continue;
-    SDL_Texture *texture = TextureManager::getInstance().getTexture(sprite->textureId);
+    }
+
+    SDL_Texture* texture = TextureManager::getInstance().getTexture(sprite->textureId);
+
     if (!texture)
+    {
       continue;
+    }
+
     float centerX = transform->positionX - cameraView.x;
     float centerY = transform->positionY - cameraView.y;
     int width = 64;
@@ -42,10 +51,14 @@ void EntityRenderer::render()
   }
 }
 
-void EntityRenderer::renderCross(SDL_Renderer *rendererPointer, float centerX, float centerY, float crossSize, SDL_Color crossColor)
+void EntityRenderer::renderCross(SDL_Renderer* rendererPointer, float centerX, float centerY,
+                                 float crossSize, SDL_Color crossColor)
 {
   if (!rendererPointer)
+  {
     throw std::invalid_argument("rendererPointer is null");
+  }
+
   SDL_SetRenderDrawColor(rendererPointer, crossColor.r, crossColor.g, crossColor.b, crossColor.a);
   int halfSize = static_cast<int>(crossSize * 0.5f);
   int cx = static_cast<int>(centerX);

@@ -1,7 +1,7 @@
 #include "core/camera_service.h"
 #include <stdexcept>
 
-CameraService &CameraService::getInstance()
+CameraService& CameraService::getInstance()
 {
   static CameraService instance;
   return instance;
@@ -15,11 +15,15 @@ CameraService::CameraService() : targetEntityId(-1)
 void CameraService::setTargetEntityId(int targetEntityId)
 {
   if (targetEntityId < 0)
+  {
     throw std::invalid_argument("Invalid entity id");
+  }
+
   this->targetEntityId = targetEntityId;
 }
 
-void CameraService::updateCameraPosition(int targetPositionX, int targetPositionY, int screenWidth, int screenHeight)
+void CameraService::updateCameraPosition(int targetPositionX, int targetPositionY, int screenWidth,
+    int screenHeight)
 {
   viewRectangle.x = targetPositionX - screenWidth / 2;
   viewRectangle.y = targetPositionY - screenHeight / 2;

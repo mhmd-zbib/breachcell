@@ -25,9 +25,15 @@ void InputState::removeScancode(SDL_Scancode scancode)
 bool InputState::isKeyActive(SDL_Keycode key) const
 {
   if (activeKeycodes.find(key) != activeKeycodes.end())
+  {
     return true;
+  }
+
   if (activeScancodes.find(SDL_GetScancodeFromKey(key)) != activeScancodes.end())
+  {
     return true;
+  }
+
   return false;
 }
 

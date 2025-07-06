@@ -40,14 +40,20 @@ struct HealthComponent
   void increment(float amount)
   {
     value += amount;
+
     if (value > maxValue)
+    {
       value = maxValue;
+    }
   }
   void decrement(float amount)
   {
     value -= amount;
+
     if (value < minValue)
+    {
       value = minValue;
+    }
   }
   float getValue() const
   {
@@ -78,5 +84,8 @@ struct AimComponent : public ShooterAimingProvider
   float standingStillTime;
   float lastVelocityMagnitude;
   float lastUpdateTime;
-  float getAimingAngle(std::uint32_t entityId) const override { return aimAngle; }
+  float getAimingAngle(std::uint32_t entityId) const override
+  {
+    return aimAngle;
+  }
 };

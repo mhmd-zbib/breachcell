@@ -4,7 +4,7 @@
 class AimingSystem
 {
 public:
-  static AimingSystem &getInstance();
+  static AimingSystem& getInstance();
   void update(std::uint32_t playerEntityId, float mousePositionX, float mousePositionY);
   void update(std::uint32_t playerEntityId);
   float getAimAngle() const;
@@ -15,8 +15,8 @@ public:
 
 private:
   AimingSystem();
-  AimingSystem(const AimingSystem &) = delete;
-  AimingSystem &operator=(const AimingSystem &) = delete;
+  AimingSystem(const AimingSystem&) = delete;
+  AimingSystem& operator=(const AimingSystem&) = delete;
   float aimAngle = 0.0f;
   float aimConeHalfAngle = 0.0f;
   bool isShooting = false;

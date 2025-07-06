@@ -4,17 +4,21 @@
 #include <stdexcept>
 #include <iostream>
 
-PlayerFactory &PlayerFactory::getInstance()
+PlayerFactory& PlayerFactory::getInstance()
 {
   static PlayerFactory instance;
   return instance;
 }
 
-std::uint32_t PlayerFactory::createPlayer(float positionX, float positionY, float rotation, float scale, std::uint32_t textureId, int drawOrder)
+std::uint32_t PlayerFactory::createPlayer(float positionX, float positionY, float rotation,
+    float scale, std::uint32_t textureId, int drawOrder)
 {
   if (scale <= 0.0f)
+  {
     throw std::invalid_argument("PlayerFactory: scale must be positive");
-  EntityManager &entityManager = EntityManager::getInstance();
+  }
+
+  EntityManager& entityManager = EntityManager::getInstance();
   std::uint32_t playerEntityId = entityManager.createEntity();
   constexpr float spriteWidth = 64.0f;
   constexpr float spriteHeight = 64.0f;
@@ -36,7 +40,8 @@ std::uint32_t PlayerFactory::createPlayer(float positionX, float positionY, floa
   entityManager.addSpriteComponent(playerEntityId, playerSprite);
   entityManager.addInputComponent(playerEntityId, playerInput);
   entityManager.addComponent(playerEntityId, playerAim);
-  std::cout << "PlayerFactory: Created player entity " << playerEntityId << " at (" << positionX << ", " << positionY << ")" << std::endl;
+  std::cout << "PlayerFactory: Created player entity " << playerEntityId << " at (" << positionX <<
+            ", " << positionY << ")" << std::endl;
   return playerEntityId;
 }
 

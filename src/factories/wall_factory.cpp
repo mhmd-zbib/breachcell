@@ -3,17 +3,21 @@
 #include "ecs/components.h"
 #include <stdexcept>
 
-WallFactory &WallFactory::getInstance()
+WallFactory& WallFactory::getInstance()
 {
   static WallFactory instance;
   return instance;
 }
 
-std::uint32_t WallFactory::createWall(float positionX, float positionY, float width, float height, int drawOrder)
+std::uint32_t WallFactory::createWall(float positionX, float positionY, float width, float height,
+                                      int drawOrder)
 {
   if (width <= 0.0f || height <= 0.0f)
+  {
     throw std::invalid_argument("WallFactory: width and height must be positive");
-  EntityManager &entityManager = EntityManager::getInstance();
+  }
+
+  EntityManager& entityManager = EntityManager::getInstance();
   std::uint32_t wallEntityId = entityManager.createEntity();
   TransformComponent wallTransform{positionX, positionY, 0.0f, 1.0f};
   SpriteComponent wallSprite{0, drawOrder};

@@ -2,11 +2,11 @@
 class WallRenderer
 {
 public:
-  static WallRenderer &getInstance();
+  static WallRenderer& getInstance();
   void render();
 
 private:
   WallRenderer() = default;
-  WallRenderer(const WallRenderer &) = delete;
-  WallRenderer &operator=(const WallRenderer &) = delete;
+  WallRenderer(const WallRenderer&) = delete;
+  WallRenderer& operator=(const WallRenderer&) = delete;
 };

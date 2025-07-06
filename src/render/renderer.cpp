@@ -1,7 +1,7 @@
 #include "render/renderer.h"
 #include "core/camera_service.h"
 
-Renderer &Renderer::getInstance()
+Renderer& Renderer::getInstance()
 {
   static Renderer instance;
   return instance;
@@ -17,13 +17,15 @@ Renderer::~Renderer()
   }
 }
 
-bool Renderer::init(SDL_Window *window)
+bool Renderer::init(SDL_Window* window)
 {
   renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
+
   if (!renderer)
   {
     return false;
   }
+
   return true;
 }
 
@@ -38,7 +40,7 @@ void Renderer::present()
   SDL_RenderPresent(renderer);
 }
 
-SDL_Renderer *Renderer::getSDLRenderer() const
+SDL_Renderer* Renderer::getSDLRenderer() const
 {
   return renderer;
 }
