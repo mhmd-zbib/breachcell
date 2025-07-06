@@ -1,14 +1,11 @@
 #include "PlayerFactory.h"
-#include "../../engine/ecs/components/speed_component.h"
+#include "../../engine/ecs/entity_manager.h"
 
-int PlayerFactory::createPlayerEntity(int nextEntityId,
-                                      std::unordered_map<int, TransformComponent>& transformComponents,
-                                      std::unordered_map<int, VelocityComponent>& velocityComponents,
-                                      std::unordered_map<int, SpeedComponent>& speedComponents, float posX, float posY,
-                                      float speed)
+int PlayerFactory::createPlayerEntity(EntityManager& entityManager, float posX, float posY, float speed)
 {
-    transformComponents[nextEntityId] = TransformComponent(posX, posY);
-    velocityComponents[nextEntityId] = VelocityComponent(0.0f, 0.0f);
-    speedComponents[nextEntityId] = SpeedComponent(speed);
-    return nextEntityId;
+    int entityId = entityManager.createEntity(EntityTag::Player);
+    entityManager.addComponent(entityId, TransformComponent(posX, posY));
+    entityManager.addComponent(entityId, VelocityComponent(0.0f, 0.0f));
+    entityManager.addComponent(entityId, SpeedComponent(speed));
+    return entityId;
 }

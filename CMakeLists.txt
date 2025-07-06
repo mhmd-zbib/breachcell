@@ -14,6 +14,7 @@ file(GLOB ENGINE_SRC
     "engine/utils/*.cpp"
     "engine/ecs/components/*.cpp"
     "engine/ecs/systems/*.cpp"
+    "engine/ecs/entity_manager.cpp"
 )
 file(GLOB GAME_SRC
     "game/*.cpp"

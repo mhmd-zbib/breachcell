@@ -24,8 +24,7 @@ void Game::setVelocitySystem(std::shared_ptr<VelocitySystem> velocitySystemPtr)
 
 void Game::initialize()
 {
-    playerEntityId = PlayerFactory::createPlayerEntity(playerEntityId, transformComponents, velocityComponents,
-                                                       speedComponents, 400.0f, 300.0f, 200.0f);
+    playerEntityId = PlayerFactory::createPlayerEntity(entityManager, 400.0f, 300.0f, 200.0f);
 }
 
 void Game::update(float deltaTime)
@@ -33,15 +32,17 @@ void Game::update(float deltaTime)
     if (!inputSystem)
         throw std::runtime_error("InputSystem not set");
     if (movementSystem)
-        movementSystem->update(inputSystem, playerEntityId, transformComponents, velocityComponents, speedComponents,
-                               deltaTime);
+        movementSystem->update(inputSystem, playerEntityId, entityManager, deltaTime);
 }
 
 void Game::render(Renderer* renderer)
 {
-    TransformComponent& transform = transformComponents[playerEntityId];
-    CircleShape circle((int) transform.getPositionX(), (int) transform.getPositionY(), 40, 0, 200, 255, 255);
-    renderer->getShapeRenderer()->drawShape(&circle, ShapeStyle::Filled);
+    TransformComponent* transform = entityManager.getComponent<TransformComponent>(playerEntityId);
+    if (transform)
+    {
+        CircleShape circle((int) transform->getPositionX(), (int) transform->getPositionY(), 40, 0, 200, 255, 255);
+        renderer->getShapeRenderer()->drawShape(&circle, ShapeStyle::Filled);
+    }
 }
 
 void Game::shutdown()

@@ -2,9 +2,6 @@
 #define GAME_H
 
 #include "../engine/core/igame.h"
-#include "../engine/ecs/components/speed_component.h"
-#include "../engine/ecs/components/transform_component.h"
-#include "../engine/ecs/components/velocity_component.h"
 #include "../engine/ecs/systems/movement_system.h"
 #include "../engine/ecs/systems/velocity_system.h"
 #include "../engine/graphics/circle_shape.h"
@@ -37,9 +34,7 @@ class Game : public IGame, public IInputInjectable
 
   private:
     int playerEntityId;
-    std::unordered_map<int, TransformComponent> transformComponents;
-    std::unordered_map<int, VelocityComponent> velocityComponents;
-    std::unordered_map<int, SpeedComponent> speedComponents;
+    EntityManager entityManager;
     InputSystem* inputSystem;
     std::shared_ptr<MovementSystem> movementSystem;
     std::shared_ptr<VelocitySystem> velocitySystem;
