@@ -22,10 +22,10 @@ class EntityManager
     void destroyEntity(int entityId);
     bool isEntityAlive(int entityId) const;
     void reset();
-    template <typename ComponentType> void addComponent(int entityId, const ComponentType& component)
+    template <typename ComponentType> void addComponent(int entityId, ComponentType&& component)
     {
         std::unordered_map<int, std::any>& componentMap = componentStorage[std::type_index(typeid(ComponentType))];
-        componentMap[entityId] = component;
+        componentMap[entityId] = std::forward<ComponentType>(component);
     }
     template <typename ComponentType> ComponentType* getComponent(int entityId)
     {

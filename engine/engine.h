@@ -4,7 +4,6 @@
 #include "core/igame.h"
 #include "ecs/systems/camera_system.h"
 #include "ecs/systems/movement_system.h"
-#include "ecs/systems/render_system.h"
 #include "ecs/systems/velocity_system.h"
 #include "graphics/renderer.h"
 #include "graphics/window.h"
@@ -35,7 +34,6 @@ class Engine
     std::shared_ptr<MovementSystem> movementSystem;
     std::shared_ptr<VelocitySystem> velocitySystem;
     std::shared_ptr<CameraSystem> cameraSystem;
-    std::shared_ptr<RenderSystem> renderSystem;
 };
 
 #endif

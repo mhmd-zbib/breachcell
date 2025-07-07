@@ -13,6 +13,7 @@ class IGame
     virtual void shutdown() = 0;
     virtual EntityManager& getEntityManager() = 0;
     virtual int getPlayerEntityId() const = 0;
+    virtual void setRenderer(Renderer* rendererPtr) = 0;
     virtual ~IGame() = default;
 };
 

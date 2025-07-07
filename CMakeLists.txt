@@ -15,6 +15,7 @@ file(GLOB ENGINE_SRC
     "engine/ecs/components/*.cpp"
     "engine/ecs/systems/*.cpp"
     "engine/ecs/entity_manager.cpp"
+    "engine/resources/*.cpp"
 )
 file(GLOB GAME_SRC
     "game/*.cpp"
@@ -32,3 +33,7 @@ target_include_directories(CppProject PRIVATE
 )
 
 target_link_libraries(CppProject PRIVATE SDL2::SDL2 SDL2_image::SDL2_image)
+
+add_custom_command(TARGET CppProject POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+        ${CMAKE_SOURCE_DIR}/assets $<TARGET_FILE_DIR:CppProject>/assets)

@@ -4,7 +4,6 @@
 #include "ecs/entity_manager.h"
 #include "ecs/systems/camera_system.h"
 #include "ecs/systems/movement_system.h"
-#include "ecs/systems/render_system.h"
 #include "ecs/systems/velocity_system.h"
 #include "graphics/renderer.h"
 #include "graphics/window.h"
@@ -32,14 +31,13 @@ void Engine::initialize()
     movementSystem = std::make_shared<MovementSystem>();
     velocitySystem = std::make_shared<VelocitySystem>();
     cameraSystem = std::make_shared<CameraSystem>();
-    renderSystem = std::make_shared<RenderSystem>();
-    renderSystem->setCameraSystem(cameraSystem);
     renderer->setCameraSystem(cameraSystem);
     if (cameraSystem)
         cameraSystem->setViewportSize(static_cast<float>(windowConfig.width), static_cast<float>(windowConfig.height));
     isRunning = true;
     if (game)
     {
+        game->setRenderer(renderer.get());
         game->initialize();
         int playerId = game->getPlayerEntityId();
         cameraSystem->setTargetEntity(playerId);
@@ -95,11 +93,8 @@ void Engine::render()
     if (renderer && renderer->isInitialized())
     {
         renderer->clear();
-        EntityManager* entityManager = nullptr;
         if (game)
-            entityManager = &(game->getEntityManager());
-        if (renderSystem && entityManager)
-            renderSystem->render(*entityManager, renderer.get());
+            game->render(renderer.get());
         renderer->present();
     }
 }
@@ -116,5 +111,4 @@ void Engine::shutdown()
     movementSystem.reset();
     velocitySystem.reset();
     cameraSystem.reset();
-    renderSystem.reset();
 }
