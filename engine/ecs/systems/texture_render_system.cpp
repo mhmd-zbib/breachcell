@@ -21,7 +21,15 @@ void TextureRenderSystem::render(EntityManager& entityManager, Renderer* rendere
         Texture* texture = textureManager->getTexture(textureComponent->getTextureId());
         if (!texture)
             throw std::runtime_error("TextureRenderSystem: Texture not found for entity " + std::to_string(entityId));
-        renderer->drawTexture(*texture, static_cast<int>(transform->getPositionX()),
-                              static_cast<int>(transform->getPositionY()));
+        try
+        {
+            renderer->drawTexture(*texture, static_cast<int>(transform->getPositionX()),
+                                  static_cast<int>(transform->getPositionY()), texture->getWidth(),
+                                  texture->getHeight(), 0.0, SDL_FLIP_NONE, nullptr, 255);
+        }
+        catch (const std::exception& ex)
+        {
+            std::fprintf(stderr, "TextureRenderSystem: Render failed for entity %d: %s\n", entityId, ex.what());
+        }
     }
 }

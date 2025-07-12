@@ -13,10 +13,7 @@
 #include <memory>
 #include <stdexcept>
 
-Engine::Engine(IGame* gameInstance, const WindowConfig& config)
-    : isRunning(false), game(gameInstance), windowConfig(config)
-{
-}
+Engine::Engine(const WindowConfig& config) : isRunning(false), windowConfig(config) {}
 
 void Engine::initialize()
 {
@@ -26,6 +23,8 @@ void Engine::initialize()
     renderer = std::make_unique<Renderer>(window.get());
     if (!renderer->initialize())
         throw std::runtime_error("Renderer initialization failed");
+    textureManager = std::make_unique<TextureManager>(renderer->getSDLRenderer());
+    gameInstance = std::make_unique<Game>(renderer.get(), textureManager.get());
     inputSystem = std::make_unique<InputSystem>();
     timer = std::make_unique<Timer>();
     movementSystem = std::make_shared<MovementSystem>();
@@ -35,11 +34,11 @@ void Engine::initialize()
     if (cameraSystem)
         cameraSystem->setViewportSize(static_cast<float>(windowConfig.width), static_cast<float>(windowConfig.height));
     isRunning = true;
-    if (game)
+    if (gameInstance)
     {
-        game->setRenderer(renderer.get());
-        game->initialize();
-        int playerId = game->getPlayerEntityId();
+        gameInstance->setRenderer(renderer.get());
+        gameInstance->initialize();
+        int playerId = gameInstance->getPlayerEntityId();
         cameraSystem->setTargetEntity(playerId);
     }
 }
@@ -50,7 +49,7 @@ void Engine::run()
     assert(renderer);
     assert(inputSystem);
     assert(timer);
-    assert(game);
+    assert(gameInstance);
     while (isRunning && renderer->isInitialized())
     {
         processInput();
@@ -70,17 +69,17 @@ void Engine::processUpdate()
     float deltaTime = timer->getDeltaTime();
     EntityManager* entityManager = nullptr;
     int playerEntityId = 0;
-    if (game)
+    if (gameInstance)
     {
-        entityManager = &(game->getEntityManager());
-        playerEntityId = game->getPlayerEntityId();
+        entityManager = &(gameInstance->getEntityManager());
+        playerEntityId = gameInstance->getPlayerEntityId();
     }
     inputSystem->nextFrame();
     if (movementSystem && entityManager)
         movementSystem->update(inputSystem.get(), playerEntityId, *entityManager, deltaTime);
     if (cameraSystem && entityManager)
         cameraSystem->update(*entityManager, deltaTime);
-    game->update(deltaTime);
+    gameInstance->update(deltaTime);
 }
 
 void Engine::processRender()
@@ -93,8 +92,8 @@ void Engine::render()
     if (renderer && renderer->isInitialized())
     {
         renderer->clear();
-        if (game)
-            game->render(renderer.get());
+        if (gameInstance)
+            gameInstance->render(renderer.get());
         renderer->present();
     }
 }
@@ -102,8 +101,8 @@ void Engine::render()
 void Engine::shutdown()
 {
     isRunning = false;
-    if (game)
-        game->shutdown();
+    if (gameInstance)
+        gameInstance->shutdown();
     renderer.reset();
     window.reset();
     inputSystem.reset();

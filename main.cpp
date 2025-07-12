@@ -1,8 +1,5 @@
 #include "engine/engine.h"
-#include "engine/graphics/renderer.h"
 #include "engine/graphics/window.h"
-#include "engine/resources/texture_manager.h"
-#include "game/game.h"
 
 int main()
 {
@@ -12,20 +9,9 @@ int main()
     config.height = 720;
     config.fullscreen = true;
 
-    Window window;
-    window.initialize(config);
-
-    Renderer renderer(&window);
-    renderer.initialize();
-
-    TextureManager textureManager(renderer.getSDLRenderer());
-
-    Game game(&renderer, &textureManager);
-
-    Engine engine(&game, config);
+    Engine engine(config);
     engine.initialize();
     engine.run();
     engine.shutdown();
-
     return 0;
 }

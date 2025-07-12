@@ -14,6 +14,8 @@ class TextureManager
     Texture* getTexture(int textureId) const;
     void unloadTexture(int textureId);
     void clear();
+    int getTextureWidth(int textureId) const;
+    int getTextureHeight(int textureId) const;
 
     TextureManager(const TextureManager&) = delete;
     TextureManager& operator=(const TextureManager&) = delete;

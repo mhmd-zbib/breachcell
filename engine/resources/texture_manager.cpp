@@ -55,3 +55,19 @@ void TextureManager::clear()
     textureMap.clear();
     nextId = 1;
 }
+
+int TextureManager::getTextureWidth(int textureId) const
+{
+    Texture* texture = getTexture(textureId);
+    if (!texture)
+        throw std::runtime_error("TextureManager: Texture not found for width query");
+    return texture->getWidth();
+}
+
+int TextureManager::getTextureHeight(int textureId) const
+{
+    Texture* texture = getTexture(textureId);
+    if (!texture)
+        throw std::runtime_error("TextureManager: Texture not found for height query");
+    return texture->getHeight();
+}

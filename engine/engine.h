@@ -1,6 +1,7 @@
 #ifndef ENGINE_H
 #define ENGINE_H
 
+#include "../game/game.h"
 #include "core/igame.h"
 #include "ecs/systems/camera_system.h"
 #include "ecs/systems/movement_system.h"
@@ -8,13 +9,14 @@
 #include "graphics/renderer.h"
 #include "graphics/window.h"
 #include "input/input_system.h"
+#include "resources/texture_manager.h"
 #include "utils/timer.h"
 #include <memory>
 
 class Engine
 {
   public:
-    Engine(IGame* gameInstance, const WindowConfig& config);
+    Engine(const WindowConfig& config);
     void initialize();
     void run();
     void render();
@@ -25,7 +27,6 @@ class Engine
 
   private:
     bool isRunning;
-    IGame* game;
     WindowConfig windowConfig;
     std::unique_ptr<Window> window;
     std::unique_ptr<Renderer> renderer;
@@ -34,6 +35,8 @@ class Engine
     std::shared_ptr<MovementSystem> movementSystem;
     std::shared_ptr<VelocitySystem> velocitySystem;
     std::shared_ptr<CameraSystem> cameraSystem;
+    std::unique_ptr<TextureManager> textureManager;
+    std::unique_ptr<Game> gameInstance;
 };
 
 #endif

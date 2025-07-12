@@ -52,14 +52,20 @@ bool Renderer::isInitialized() const
     return initialized;
 }
 
-void Renderer::drawTexture(const Texture& texture, int x, int y, int w, int h, double angle, SDL_RendererFlip flip)
+void Renderer::drawTexture(const Texture& texture, int x, int y, int w, int h, double angle, SDL_RendererFlip flip,
+                           const SDL_Rect* srcRect, Uint8 alpha)
 {
     SDL_Rect dstRect;
     dstRect.x = x;
     dstRect.y = y;
     dstRect.w = (w > 0) ? w : texture.getWidth();
     dstRect.h = (h > 0) ? h : texture.getHeight();
-    SDL_RenderCopyEx(renderer, texture.getNativeTexture(), nullptr, &dstRect, angle, nullptr, flip);
+    SDL_SetTextureAlphaMod(texture.getNativeTexture(), alpha);
+    if (SDL_RenderCopyEx(renderer, texture.getNativeTexture(), srcRect, &dstRect, angle, nullptr, flip) != 0)
+    {
+        std::fprintf(stderr, "Renderer: SDL_RenderCopyEx failed: %s\n", SDL_GetError());
+        throw std::runtime_error("Renderer: SDL_RenderCopyEx failed");
+    }
 }
 
 std::unique_ptr<Texture> Renderer::loadTexture(const std::string& filePath)

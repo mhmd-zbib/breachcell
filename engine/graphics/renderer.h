@@ -22,7 +22,7 @@ class Renderer
     void shutdown();
     bool isInitialized() const;
     void drawTexture(const Texture& texture, int x, int y, int w = -1, int h = -1, double angle = 0.0,
-                     SDL_RendererFlip flip = SDL_FLIP_NONE);
+                     SDL_RendererFlip flip = SDL_FLIP_NONE, const SDL_Rect* srcRect = nullptr, Uint8 alpha = 255);
     std::unique_ptr<Texture> loadTexture(const std::string& filePath);
     ShapeRenderer* getShapeRenderer();
     SDL_Renderer* getSDLRenderer();
