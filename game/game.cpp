@@ -1,4 +1,5 @@
 #include "game.h"
+#include "../engine/ecs/components/texture_component.h"
 #include "../engine/graphics/renderer.h"
 #include "../engine/resources/texture_manager.h"
 #include "entities/BoxFactory.h"
@@ -18,9 +19,12 @@ void Game::initialize()
 {
     int playerTextureId = textureManager->loadTexture("player", "assets/player.png");
     playerEntityId = PlayerFactory::createPlayerEntity(entityManager, 400.0f, 300.0f, 200.0f, playerTextureId);
-    BoxFactory::createBoxEntity(entityManager, 100.0f, 100.0f, 60.0f, 60.0f, 255, 0, 0, 255);
-    BoxFactory::createBoxEntity(entityManager, -200.0f, -100.0f, 60.0f, 60.0f, 255, 0, 0, 255);
+    int boxTextureId = textureManager->loadTexture("box", "assets/box.png");
+    int texturedBoxEntityId =
+        BoxFactory::createBoxEntity(entityManager, 200.0f, 200.0f, 60.0f, 60.0f, 255, 255, 255, 255);
+    BoxFactory::addTextureComponent(entityManager, texturedBoxEntityId, boxTextureId);
     textureRenderSystem = std::make_unique<TextureRenderSystem>(textureManager);
+    BoxFactory::createBoxEntity(entityManager, 100.0f, 100.0f, 60.0f, 60.0f, 255, 0, 0, 255);
 }
 
 int Game::getPlayerEntityId() const

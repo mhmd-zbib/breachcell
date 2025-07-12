@@ -7,7 +7,7 @@
 int PlayerFactory::createPlayerEntity(EntityManager& entityManager, float posX, float posY, float speed, int textureId)
 {
     int entityId = entityManager.createEntity(EntityTag::Player);
-    entityManager.addComponent(entityId, TransformComponent(posX, posY));
+    entityManager.addComponent(entityId, TransformComponent(posX, posY, 0.0f));
     entityManager.addComponent(entityId, VelocityComponent(0.0f, 0.0f));
     entityManager.addComponent(entityId, SpeedComponent(speed));
     entityManager.addComponent(entityId, TextureComponent(textureId));

@@ -4,6 +4,18 @@
 #include <cmath>
 #include <stdexcept>
 
+namespace
+{
+float calculateAngleToTarget(float sourceX, float sourceY, float targetX, float targetY)
+{
+    float dx = targetX - sourceX;
+    float dy = targetY - sourceY;
+    if (dx == 0.0f && dy == 0.0f)
+        return 0.0f;
+    return std::atan2(dy, dx) * 180.0f / static_cast<float>(M_PI);
+}
+} // namespace
+
 void MovementSystem::processInput(InputSystem* inputSystem, int entityId, VelocityComponent* velocityComponent)
 {
     if (!inputSystem || !velocityComponent)
@@ -44,4 +56,16 @@ void MovementSystem::update(InputSystem* inputSystem, int entityId, EntityManage
     float newY = transform->getPositionY() + velocityY * deltaTime;
     transform->setPositionX(newX);
     transform->setPositionY(newY);
+    if (inputSystem)
+    {
+        auto& mouse = inputSystem->getMouse();
+        auto mousePos = mouse.getMousePosition();
+        // Mouse position is in screen coordinates; rotation logic should use world coordinates only.
+        // For AAA standards, camera offset and mapping are handled in the rendering system.
+        float playerX = transform->getPositionX();
+        float playerY = transform->getPositionY();
+        // If needed, provide a hook for the rendering system to supply mapped mouse world coordinates.
+        // For now, set rotation to zero (or retain previous logic if world mouse position is available).
+        // transform->setRotation(angle);
+    }
 }

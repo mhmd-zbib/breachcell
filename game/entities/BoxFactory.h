@@ -12,6 +12,7 @@ class BoxFactory
     static int createBoxEntity(EntityManager& entityManager, float positionX, float positionY, float width,
                                float height, unsigned char red, unsigned char green, unsigned char blue,
                                unsigned char alpha = 255);
+    static void addTextureComponent(EntityManager& entityManager, int entityId, int textureId);
 };
 
 #endif

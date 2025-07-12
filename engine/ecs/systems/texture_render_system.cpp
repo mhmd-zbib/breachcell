@@ -1,5 +1,7 @@
 #include "texture_render_system.h"
+#include "../components/camera_component.h"
 #include "../components/texture_component.h"
+#include "../systems/camera_system.h"
 #include <stdexcept>
 
 TextureRenderSystem::TextureRenderSystem(TextureManager* manager) : textureManager(manager)
@@ -12,6 +14,10 @@ void TextureRenderSystem::render(EntityManager& entityManager, Renderer* rendere
 {
     if (!renderer)
         throw std::invalid_argument("Renderer pointer is null");
+    std::shared_ptr<CameraSystem> cameraSystem = renderer->getCameraSystem();
+    CameraComponent* camera = cameraSystem ? cameraSystem->getCameraComponent() : nullptr;
+    float cameraX = camera ? camera->getPositionX() : 0.0f;
+    float cameraY = camera ? camera->getPositionY() : 0.0f;
     for (int entityId : entityManager.getAllEntities())
     {
         TransformComponent* transform = entityManager.getComponent<TransformComponent>(entityId);
@@ -21,11 +27,13 @@ void TextureRenderSystem::render(EntityManager& entityManager, Renderer* rendere
         Texture* texture = textureManager->getTexture(textureComponent->getTextureId());
         if (!texture)
             throw std::runtime_error("TextureRenderSystem: Texture not found for entity " + std::to_string(entityId));
+        double rotationAngle = static_cast<double>(transform->getRotation());
+        int drawX = static_cast<int>(transform->getPositionX() - cameraX);
+        int drawY = static_cast<int>(transform->getPositionY() - cameraY);
         try
         {
-            renderer->drawTexture(*texture, static_cast<int>(transform->getPositionX()),
-                                  static_cast<int>(transform->getPositionY()), texture->getWidth(),
-                                  texture->getHeight(), 0.0, SDL_FLIP_NONE, nullptr, 255);
+            renderer->drawTexture(*texture, drawX, drawY, texture->getWidth(), texture->getHeight(), rotationAngle,
+                                  SDL_FLIP_NONE, nullptr, 255);
         }
         catch (const std::exception& ex)
         {
